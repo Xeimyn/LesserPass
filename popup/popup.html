@@ -3,27 +3,36 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>HideAway</title>
+		<title>LesserPass</title>
 		<link rel="stylesheet" href="popup.css">
-		<script type="module" src="popup.js" defer></script>
+		<script src="popup.js" defer></script>
 	</head>
 	<body>
-		<div class="sidebyside titleSection">
-			<img src="../assets/128x128.png" alt="" class="logo">
+		<div class="titleSection sidebyside">
+			<img src="../assets/128x128.png" alt="A key with striked through eye in its bow." class="keyLogo">
 			<h2 class="title">LesserPass</h2>
 		</div>
 		<div class="form toponbottom">
 			<input type="text" placeholder="google.com" class="site">
 			<input type="text" placeholder="max@gmail.com" class="login">
 			<input type="text" placeholder="S3cur3P4ssw0rd1!" class="masterPassword">
-			<div class="sidebyside">
-				<input type="number" value="0" placeholder="Index" class="numberInput index">
-				<input type="number" value="16" class="numberInput length">
+			<div class="quickSettings sidebyside">
+				<h2 title="Length" class="label">L</h2>
+				<input type="number" min="1" value="16" placeholder="Length" class="lengthInput numberInput">
+				<input type="number"  value="0" placeholder="Index" class="indexInput numberInput">
+				<h2 title="Index" class="label">I</h2>
 			</div>
 			<div class="outputContainer sidebyside">
-				<input type="text" disabled class="output">
-				<button onclick="" class="toggleView"></button>
+				<input type="password" class="output">
+				<button class="toggleViewButton">
+					<img src="../assets/icons/eye.svg" alt="Eye" class="toggleButtonImg">
+				</button>
 			</div>
+		</div>
+		<div class="links sidebyside">
+			<a href="" class="settings">Settings</a>
+			<a href="" class="source">Source</a>
+			<a href="" class="donate">Plhldr</a>
 		</div>
 	</body>
 	</html>

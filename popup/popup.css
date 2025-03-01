@@ -1,13 +1,12 @@
 html {
-	border: 1px solid white;
 	width: 250px;
-	height: 330px;
+	height: 310px;
 }
 
 body {
 	margin: 0;
-	width: 100%;
 	background-color: black;
+	border: 2px solid white;
 }
 
 input {
@@ -16,79 +15,119 @@ input {
 	background-color: black;
 	color: white;
 	border: 2px solid white;
+	transition: 100ms;
 }
 
-.form {
-	gap:3.5vh;
+input:focus {
+	outline: none;
+	scale: 1.05;
 }
 
-.logo {
-	height: 16vw;
-	width: 16vw;
-}
-
-.titleSection {
-	gap: 2.2vw;
-	transform: translateX(-20px);
-}
-
-.title {
-	color: white;
-	width: 55vw;
-	font-size: 25pt;
-	text-align: left;
-	margin-left: -2.5vh;
-	margin-top: 3.5vh;
-	margin-bottom: 3.5vh;
-}
-
-.settings {
-	width: 20px;
-	height:	20px;
-	text-decoration: none;
-}
-
-.settingsIcon {
-	width: 100%;
-	filter: invert();
-	transition: 300ms;
-}
-
-.settingsIcon:hover {
-	rotate: 90deg;
-}
-
-.numberInput {
-	width: 39%
-}
-
-.index {
-	border-right: 1px solid white ;
-}
-
-.length {
-	border-left: 1px solid white ;
-}
+/* --- */
 
 .sidebyside {
-	width: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 
 .toponbottom {
-	height: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	flex-direction: column;
 }
 
-.toggleView{
-	position: absolute;
+/* --- */
+
+.titleSection {
+	width: 250px;
+	gap: 2.5vw;
+	transform: translateX(-10px);
+}
+
+.keyLogo {
+	height: 16vw;
+	width: 16vw;
+}
+
+.title {
+	color: white;
+	font-size: 27pt;
+	text-align: center;
+	margin-left: -2.5vh;
+	margin-top: 3.5vh;
+	margin-bottom: 3.5vh;
+}
+
+.form {
+	gap:3.5vh;
+}
+
+.numberInput {
+	width: 76px;
+	text-align: center;
+}
+
+.label {
+	text-align: center;
+	width: 20px;
+	color: white;
+}
+
+.quickSettings {
+	margin-top: -3vh;
+	margin-bottom: -3vh;
+}
+
+.lengthInput {
+	border-right: 1px solid white;
+}
+
+.indexInput {
+	border-left: 1px solid white;
+}
+
+.outputContainer {
+	width: 100%;
+	justify-content: center;
+}
+
+.output {
+	width: 67.5%;
+}
+
+.toggleViewButton{
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	border: 2px solid white;
-	width: 30px;
-	height: 30px;
-	transform: translateX(300%);
+	width: 31px;
+	aspect-ratio: 1;
+	overflow: hidden
+}
+
+.toggleButtonImg {
+	scale: 1.75;
+}
+
+.links {
+	gap: 10vw;
+	margin: 0;
+	height: 35px;
+	color: white;
+}
+
+
+/* SO to https://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-input-s-spin-box */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+	appearance: textfield; /* Standard */
+	-moz-appearance: textfield; /* Firefox */
 }

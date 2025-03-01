@@ -4,7 +4,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 	const loginElement          = document.getElementsByClassName("login")[0];
 	const masterPasswordElement = document.getElementsByClassName("masterPassword")[0];
 	const outputElement         = document.getElementsByClassName("output")[0];
-	const indexElement         = document.getElementsByClassName("index")[0];
+	const indexElement          = document.getElementsByClassName("indexInput")[0];
+	const lengthElement         = document.getElementsByClassName("lengthInput")[0];
 
 
 	// TODO | get these from local storage
@@ -18,14 +19,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 	// used to gen a password if any of the inputs change
-	[siteElement, loginElement, masterPasswordElement,indexElement].forEach(function(element) {
+	[siteElement, loginElement, masterPasswordElement,indexElement,lengthElement].forEach(function(element) {
 		element.addEventListener("keyup", async function() {
 			const site = siteElement.value;
 			const login = loginElement.value;
 			const masterPassword = masterPasswordElement.value;
 			const index = indexElement.value
 
-			const length = 16
+			const length = lengthElement.value;
 			const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~"
 
 			if (site != "" && login != "" && masterPassword != "") {
