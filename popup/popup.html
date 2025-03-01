@@ -8,14 +8,22 @@
 		<script type="module" src="popup.js" defer></script>
 	</head>
 	<body>
-		<img src="../assets/128x128.png" alt="" class="logo"><h2 class="title">LesserPass</h2><a href="../settings/settings.html" target="_blank" class="settings">⚙️</a>
-		<div class="form">
-			<input type="text" class="site">
-			<input type="text" class="login">
-			<input type="text" class="masterPassword"><input type="number" class="index">
+		<div class="sidebyside titleSection">
+			<img src="../assets/128x128.png" alt="" class="logo">
+			<h2 class="title">LesserPass</h2>
 		</div>
-		<div class="outputContainer">
-			<input type="text" class="output"><button class="toggleView"></button>
+		<div class="form toponbottom">
+			<input type="text" placeholder="google.com" class="site">
+			<input type="text" placeholder="max@gmail.com" class="login">
+			<input type="text" placeholder="S3cur3P4ssw0rd1!" class="masterPassword">
+			<div class="sidebyside">
+				<input type="number" value="0" placeholder="Index" class="numberInput index">
+				<input type="number" value="16" class="numberInput length">
+			</div>
+			<div class="outputContainer sidebyside">
+				<input type="text" disabled class="output">
+				<button onclick="" class="toggleView"></button>
+			</div>
 		</div>
 	</body>
-</html>
+	</html>
