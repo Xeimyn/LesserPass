@@ -5,16 +5,17 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>HideAway</title>
 		<link rel="stylesheet" href="popup.css">
-		<script src="popup.js" defer></script>
+		<script type="module" src="popup.js" defer></script>
 	</head>
 	<body>
+		<img src="../assets/128x128.png" alt="" class="logo"><h2 class="title">LesserPass</h2><a href="../settings/settings.html" target="_blank" class="settings">⚙️</a>
 		<div class="form">
 			<input type="text" class="site">
 			<input type="text" class="login">
-			<input type="text" class="masterPassword">
+			<input type="text" class="masterPassword"><input type="number" class="index">
 		</div>
-		<div class="output">
-			<input type="text" class="output">
+		<div class="outputContainer">
+			<input type="text" class="output"><button class="toggleView"></button>
 		</div>
 	</body>
 </html>

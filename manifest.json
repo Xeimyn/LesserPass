@@ -16,6 +16,12 @@
 		"default_title": "LesserPass (Ctrl+Shift+L)",
 		"default_popup": "popup/popup.html"
 	},
+	"content_scripts": [
+		{
+		"matches": ["<all_urls>"],
+		"js": ["content/content.js"]
+		}
+	],
 	"commands": {
 		"_execute_action": {
 			"suggested_key": {
