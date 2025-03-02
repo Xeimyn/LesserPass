@@ -17,10 +17,16 @@
 			<input type="text" placeholder="max@gmail.com" class="login">
 			<input type="text" placeholder="S3cur3P4ssw0rd1!" class="masterPassword">
 			<div class="quickSettings sidebyside">
-				<h2 title="Length" class="label">L</h2>
-				<input type="number" min="1" value="16" placeholder="Length" class="lengthInput numberInput">
-				<input type="number"  value="0" placeholder="Index" class="indexInput numberInput">
-				<h2 title="Index" class="label">I</h2>
+				<div class="numberInputContainer">
+					<button class="minusButton">-</button>
+					<input type="number" min="1" value="16" placeholder="Length" class="lengthInput numberInput">
+					<button class="plusButton">+</button>
+				</div>
+				<div class="numberInputContainer">
+					<button class="minusButton">-</button>
+					<input type="number" min="0" value="0" placeholder="Index" class="indexInput numberInput">
+					<button class="plusButton">+</button>
+				</div>
 			</div>
 			<div class="outputContainer sidebyside">
 				<input type="text" class="output">
@@ -30,9 +36,9 @@
 			</div>
 		</div>
 		<div class="links sidebyside">
-			<a href="" class="settings">Settings</a>
-			<a href="" class="source">Source</a>
-			<a href="" class="donate">Plhldr</a>
+			<a href="../settings/settings.html" target="_blank" class="settings">Settings</a>
+			<a href="https://github.com/Xeimyn/LesserPass" target="_blank" class="source">Source</a>
+			<a href="" class="plchldr">Placeholder</a>
 		</div>
 	</body>
 	</html>

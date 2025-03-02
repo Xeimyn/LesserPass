@@ -98,10 +98,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 		return passwordChars.join('');
 	}
 
-
-
-
-
 	// Get current tab URL
 	const [tab] = await chrome.tabs.query({active: true, lastFocusedWindow: true});
 	const cleanURL = cleanUrl(tab.url,settings.urlFormatting)

@@ -64,28 +64,47 @@ input:focus {
 	gap:3.5vh;
 }
 
-.numberInput {
-	width: 76px;
-	text-align: center;
-}
-
-.label {
-	text-align: center;
-	width: 20px;
-	color: white;
-}
-
 .quickSettings {
-	margin-top: -3vh;
-	margin-bottom: -3vh;
+	gap: 2vw;
+	width: 80%;
 }
 
-.lengthInput {
-	border-right: 1px solid white;
+.numberInput {
+	width: 92px;
+	text-align: center;
 }
 
-.indexInput {
-	border-left: 1px solid white;
+.minusButton {
+	cursor: pointer;
+	background-color: transparent;
+	color: white;
+	position: absolute;
+	height: 27px;
+	width: 27px;
+	margin-top: 1px;
+	margin-left: 2px;
+	border: none;
+	font-size: 20pt;
+	text-align: center;
+	line-height: 25px;
+	z-index: 5;
+}
+
+.plusButton {
+	cursor: pointer;
+	background-color: transparent;
+	color: white;
+	position: absolute;
+	height: 27px;
+	width: 27px;
+	margin-right: 2px;
+	margin-top: 1px;
+	border: none;
+	font-size: 18pt;
+	text-align: center;
+	line-height: 25px;
+	transform: translateX(-107%);
+	z-index: 5;
 }
 
 .outputContainer {
@@ -116,6 +135,7 @@ input:focus {
 	margin: 0;
 	height: 35px;
 	color: white;
+	
 }
 
 
