@@ -44,6 +44,7 @@ input:focus {
 	width: 250px;
 	gap: 2.5vw;
 	transform: translateX(-10px);
+	user-select: none;
 }
 
 .keyLogo {
@@ -114,19 +115,24 @@ input:focus {
 
 .output {
 	width: 67.5%;
+	cursor: copy;
 }
 
 .toggleViewButton{
+	background-color: transparent;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	border: 2px solid white;
+	border-left: none;
 	width: 31px;
 	aspect-ratio: 1;
-	overflow: hidden
+	overflow: hidden;
+	cursor: pointer;
 }
 
 .toggleButtonImg {
+	filter: invert();
 	scale: 1.75;
 }
 
@@ -135,7 +141,7 @@ input:focus {
 	margin: 0;
 	height: 35px;
 	color: white;
-	
+
 }
 
 

@@ -18,18 +18,18 @@
 			<input type="text" placeholder="S3cur3P4ssw0rd1!" class="masterPassword">
 			<div class="quickSettings sidebyside">
 				<div class="numberInputContainer">
-					<button class="minusButton">-</button>
+					<button id="minusBL" class="minusButton">-</button>
 					<input type="number" min="1" value="16" placeholder="Length" class="lengthInput numberInput">
-					<button class="plusButton">+</button>
+					<button id="plusBL" class="plusButton">+</button>
 				</div>
 				<div class="numberInputContainer">
-					<button class="minusButton">-</button>
+					<button id="minusBI" class="minusButton">-</button>
 					<input type="number" min="0" value="0" placeholder="Index" class="indexInput numberInput">
-					<button class="plusButton">+</button>
+					<button id="plusBI" class="plusButton">+</button>
 				</div>
 			</div>
 			<div class="outputContainer sidebyside">
-				<input type="text" class="output">
+				<input title="Click to copy" type="password" readonly class="output">
 				<button class="toggleViewButton">
 					<img src="../assets/icons/eye.svg" alt="Eye" class="toggleButtonImg">
 				</button>
