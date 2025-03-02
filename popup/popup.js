@@ -53,12 +53,53 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	async function genPW(site, login, masterPassword, length, chars) {
 		const encoder = new TextEncoder();
-		const data = encoder.encode(site + login + masterPassword);
-		const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-		const hashArray = Array.from(new Uint8Array(hashBuffer));
-		const hashString = hashArray.map(b => chars[b % chars.length]).join('');
-		return hashString.slice(0, length);
+		const salt = encoder.encode(site + login); // Use site + login as a fixed salt to ensure deterministic output
+
+		let derivedBits;
+		if (window.crypto.subtle.importKey && window.crypto.subtle.deriveBits) {
+			try {
+				// Generate key material from master password using PBKDF2
+				const keyMaterial = await window.crypto.subtle.importKey(
+					"raw", encoder.encode(masterPassword), { name: "PBKDF2" }, false, ["deriveBits"]
+				);
+
+				// Derive a 256-bit key using PBKDF2 with 310,000 iterations for security
+				derivedBits = await window.crypto.subtle.deriveBits(
+					{ name: "PBKDF2", salt: salt, iterations: 310000, hash: "SHA-256" },
+					keyMaterial, 256
+				);
+			} catch (error) {
+				console.warn("PBKDF2 failed, falling back to SHA-256.");
+
+				// Fallback: Directly hash the concatenated inputs using SHA-256
+				const data = encoder.encode(site + login + masterPassword);
+				const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+				derivedBits = new Uint8Array(hashBuffer);
+			}
+		} else {
+			console.warn("Crypto API not supported, using SHA-256 fallback.");
+
+			// Fallback: Directly hash the concatenated inputs using SHA-256
+			const data = encoder.encode(site + login + masterPassword);
+			const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+			derivedBits = new Uint8Array(hashBuffer);
+		}
+
+		// Convert derived bits to an array of usable characters from the provided charset
+		const hashArray = Array.from(new Uint8Array(derivedBits));
+		let passwordChars = [];
+		for (let i = 0; i < length; i++) {
+			// Generate an index by mixing two different bytes from the hash, reducing modulo bias
+			let index = (hashArray[i] + hashArray[(i + length) % hashArray.length]) % chars.length;
+			passwordChars.push(chars[index]);
+		}
+
+		// Return the final generated password as a string
+		return passwordChars.join('');
 	}
+
+
+
 
 
 	// Get current tab URL
@@ -86,12 +127,12 @@ function cleanUrl(url,urlFormattingSettings) {
 	return url
 }
 
-// Send message to content script to autofill the password
-function autofillPassword(password) {
-	chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-	  chrome.tabs.sendMessage(tabs[0].id, {
-		action: "autofillPassword",
-		password: password
-	  });
-	});
-  }
+// // Send message to content script to autofill the password
+// function autofillPassword(password) {
+// 	chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+// 	  chrome.tabs.sendMessage(tabs[0].id, {
+// 		action: "autofillPassword",
+// 		password: password
+// 	  });
+// 	});
+//   }
