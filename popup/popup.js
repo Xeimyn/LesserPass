@@ -27,7 +27,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 			"masterPW": "",
 			"length"  : 16,
 			"index"   : 0
-		}
+		},
+		"autofill": true
 	}
 
 	// TODO | get these from local storage
