@@ -22,13 +22,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 			"stripPath"     : true,
 			"stripProtocol" : true
 		},
-		"input":{
+		"defaultInput":{
 			"login"   : "",
 			"masterPW": "",
 			"length"  : 16,
-			"index"   : 0
+			"index"   : 0,
+			"charset" : "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW0123456789!`\"§$\\%&/(){[]}=?'#.,;:<>|_-"
 		},
-		"autofill": true
+		"misc": {
+			"focus":null, // [site,login,masterpw,length,index]
+			"autofill": true
+		}
 	}
 
 	// TODO | get these from local storage
