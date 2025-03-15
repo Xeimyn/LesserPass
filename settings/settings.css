@@ -1,0 +1,120 @@
+* {
+	margin: 0;
+}
+
+body {
+	width: 100vw;
+	height: 100vh;
+	background-color: black;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+
+h1, h2, h3 {
+	color: white;
+	text-align: center;
+}
+
+.textInput {
+	height: 25px;
+	background-color: black;
+	color: white;
+	border: 2px solid white;
+}
+
+.numberInput {
+	height: 25px;
+	text-align: center;
+	background-color: black;
+	color: white;
+	border: 2px solid white;
+}
+
+.minusButton {
+	cursor: pointer;
+	background-color: transparent;
+	color: white;
+	position: absolute;
+	height: 27px;
+	width: 27px;
+	margin-top: 1px;
+	margin-left: 2px;
+	border: none;
+	font-size: 20pt;
+	text-align: center;
+	line-height: 25px;
+	z-index: 5;
+}
+
+.plusButton {
+	cursor: pointer;
+	background-color: transparent;
+	color: white;
+	position: absolute;
+	height: 27px;
+	width: 27px;
+	margin-right: 2px;
+	margin-top: 1px;
+	border: none;
+	font-size: 18pt;
+	text-align: center;
+	line-height: 25px;
+	transform: translateX(-107%);
+	z-index: 5;
+}
+
+.title {
+	font-size: 3vw;
+	margin-bottom: 3vh;
+}
+
+.Settings {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 3vh;
+	width: 25vw;
+	height: 80vh;
+	border: 2px white solid;
+}
+
+h2 {
+	text-decoration: underline;
+	font-size: 300%;
+}
+
+.urlFormatting,.defaultInputs,.miscSettings {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1vh;
+}
+
+.switchContainer {
+	width: 80%;
+	gap: 1vw;
+	display: flex;
+	justify-content: center;
+}
+
+.settingTitle {
+	text-align: left;
+	min-width: 150px;
+}
+
+.toggleInput {
+	width: 20px;
+	accent-color: black;
+}
+
+/* SO to https://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-input-s-spin-box */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}

@@ -4,7 +4,7 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>LesserPass - Settings</title>
-
+		<link rel="stylesheet" href="settings.css">
 	</head>
 	<body>
 		<h1 class="title">Settings</h1>
@@ -13,30 +13,34 @@
 				<h2>URL Formatting</h2>
 					<div class="switchContainer">
 						<h3 class="settingTitle">Strip subdomain</h3>
-						<input type="checkbox" name="stripSubDomain" checked>
+						<input type="checkbox" class="toggleInput" name="stripSubDomain" checked>
 					</div>
 					<div class="switchContainer">
 						<h3 class="settingTitle">Strip url path</h3>
-						<input type="checkbox" name="stripPath" checked>
+						<input type="checkbox" class="toggleInput" name="stripPath" checked>
 					</div>
 					<div class="switchContainer">
 						<h3 class="settingTitle">Strip url protocol</h3>
-						<input type="checkbox" name="stripProtocol" checked>
+						<input type="checkbox" class="toggleInput" name="stripProtocol" checked>
 					</div>
 			</div>
 			<div class="defaultInputs">
 				<h2>Default Input</h2>
 				<div class="inputContainer">
 					<h3 class="settingTitle">Default login</h3>
-					<input type="text" name="login" value="">
+					<input type="text" class="textInput" name="login" value="">
 				</div>
 				<div class="inputContainer">
 					<h3 class="settingTitle">Default password length</h3>
-					<input type="number" name="length" value="16">
+					<button id="plusBL" class="minusButton">-</button>
+					<input type="number" class="numberInput" name="length" value="16">
+					<button id="plusBL" class="plusButton">+</button>
 				</div>
 				<div class="inputContainer">
 					<h3 class="settingTitle">Default password index</h3>
-					<input type="number" name="index" value="0">
+					<button id="minusBI" class="minusButton">-</button>
+					<input type="number" class="numberInput" name="index" value="0">
+					<button id="plusBI" class="plusButton">+</button>
 				</div>
 			</div>
 			<div class="miscSettings">
@@ -58,66 +62,9 @@
 				</div>
 				<div class="switchContainer">
 					<h3 class="settingTitle">Enable Autofill</h3>
-					<input type="checkbox" name="autofill" checked>
+					<input type="checkbox" class="toggleInput" name="autofill" checked>
 				</div>
 			</div>
 		</div>
 	</body>
 </html>
-
-
-
-<style>
-	* {
-		margin: 0;
-	}
-
-	body {
-		width: 100vw;
-		height: 100vh;
-		background-color: black;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		flex-direction: column;
-	}
-
-	h1, h2, h3 {
-		color: white;
-		text-align: center;
-	}
-
-	.title {
-		font-size: 3vw;
-		margin-bottom: 3vh;
-	}
-
-	.Settings {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		gap: 3vh;
-		width: 25vw;
-		height: 80vh;
-		border: 2px white solid;
-	}
-
-	h2 {
-		text-decoration: underline;
-		font-size: 300%;
-	}
-
-	.urlFormatting,.defaultInputs,.miscSettings {
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 1vh;
-	}
-
-	.switchContainer {
-		display: flex;
-		gap: 1vw;
-	}
-</style>

@@ -119,7 +119,7 @@ input:focus {
 }
 
 .toggleViewButton{
-	background-color: transparent;
+	/* background-color: transparent; */
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -129,10 +129,11 @@ input:focus {
 	aspect-ratio: 1;
 	overflow: hidden;
 	cursor: pointer;
+	background-color: white;
 }
 
 .toggleButtonImg {
-	filter: invert();
+	/* filter: invert(); */
 	scale: 1.75;
 }
 
@@ -143,7 +144,6 @@ input:focus {
 	color: white;
 
 }
-
 
 /* SO to https://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-input-s-spin-box */
 input::-webkit-outer-spin-button,
