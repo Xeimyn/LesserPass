@@ -5,6 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>LesserPass - Settings</title>
 		<link rel="stylesheet" href="settings.css">
+		<script src="settings.js" defer></script>
 	</head>
 	<body>
 		<h1 class="title">Settings</h1>
@@ -45,13 +46,17 @@
 			</div>
 			<div class="miscSettings">
 				<h2>Miscellaneous</h2>
-				<div class="inputContainer">
-					<h3 class="settingTitle">Password charset</h3>
-					<input type="text" name="charset" value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW0123456789!`&quot§$\%&/(){[]}=?'#.,;:<>|_-">
+				<div class="switchContainer">
+					<h3 class="settingTitle">Enable Autofill</h3>
+					<input type="checkbox" class="toggleInput" name="autofill" checked>
 				</div>
-				<div class="inputContainer">
+				<div class="switchContainer">
+					<h3 class="settingTitle">Show "Copied" overlay</h3>
+					<input type="checkbox" class="toggleInput" name="copiedOverlay" checked>
+				</div>
+				<div class="inputContainer focusSelect">
 					<h3 class="settingTitle">UI auto focus</h3>
-					<select name="focus">
+					<select class="focusselector" name="focus">
 						<option value="Site">Site</option>
 						<option value="Login">Login</option>
 						<option value="MasterPW">MasterPW</option>
@@ -60,9 +65,9 @@
 						<option value="None">None</option>
 					</select>
 				</div>
-				<div class="switchContainer">
-					<h3 class="settingTitle">Enable Autofill</h3>
-					<input type="checkbox" class="toggleInput" name="autofill" checked>
+				<div class="inputContainer">
+					<h3 class="patch settingTitle">Password charset</h3>
+					<input class="charset" type="text" name="charset" value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW0123456789!`&quot§$\%&/(){[]}=?'#.,;:<>|_-">
 				</div>
 			</div>
 		</div>

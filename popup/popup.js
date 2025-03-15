@@ -7,14 +7,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 	const lengthElement         = document.getElementsByClassName("lengthInput")[0];
 	const outputElement         = document.getElementsByClassName("output")[0];
 
-	const minusButtonLength     = document.getElementById("minusBL")
-	const plusButtonLength     = document.getElementById("plusBL")
+	const minusButtonLength = document.getElementById("minusBL")
+	const plusButtonLength  = document.getElementById("plusBL")
 
-	const minusButtonIndex     = document.getElementById("minusBI")
-	const plusButtonIndex     = document.getElementById("plusBI")
+	const minusButtonIndex = document.getElementById("minusBI")
+	const plusButtonIndex  = document.getElementById("plusBI")
 
 	const toggleViewButton      = document.getElementsByClassName("toggleViewButton")[0];
 	const toggleViewButtonImage = document.getElementsByClassName("toggleButtonImg")[0];
+
+	const copiedOverlay = document.getElementsByClassName("copiedOverlay")[0]
 
 	const defaultSettings = {
 		"urlFormatting": {
@@ -24,14 +26,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 		},
 		"defaultInput":{
 			"login"   : "",
-			"masterPW": "",
 			"length"  : 16,
 			"index"   : 0,
-			"charset" : "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW0123456789!`\"§$\\%&/(){[]}=?'#.,;:<>|_-"
 		},
 		"misc": {
-			"focus":null, // [site,login,masterpw,length,index]
-			"autofill": true
+			"autofill": true,
+			"copiedOverlay": true,
+			"focus":null, // [site,login,masterpw,length,index,null]
+			"charset" : "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW0123456789!\"$%&()=?#.,<>|_-",
 		}
 	}
 
@@ -100,17 +102,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 	 })
 
 	// used to copy to clipboard when confirming masterpw via enter
-	masterPasswordElement.addEventListener("keyup", function(event) {
+	masterPasswordElement.addEventListener("keydown", function(event) {
 		if (event.key === "Enter") {
-			navigator.clipboard.writeText(outputElement.value).then(() => {
-				console.log('Password copied to clipboard');
-			autofillPassword(outputElement.value)
-			}).catch(err => {
-				console.error('Could not copy text: ', err);
-			});
+			copyToClipboard(outputElement.value)
 		}
 	});
 
+	outputElement.addEventListener("click",function() {
+		copyToClipboard(outputElement.value)
+	})
+
+	function showOverlay() {
+		copiedOverlay.style.visibility = "visible"
+		setTimeout(() => {
+			copiedOverlay.style.visibility = "hidden"
+		  }, 1250);
+	}
+
+	function copyToClipboard(value) {
+		if (value != "") {
+			navigator.clipboard.writeText(value).then(() => {
+				console.log('Password copied to clipboard');
+				showOverlay()
+			}).catch(err => {
+				console.error('Could not copy text: ', err);
+			});
+		} else {
+			console.log('Not gonna copy empty text')
+		}
+	}
 
 	async function genPW(site, login, masterPassword, length, index, chars) {
 		const encoder = new TextEncoder();
@@ -166,9 +186,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	// insert url to url field
 	siteElement.value = cleanURL
-	masterPasswordElement.focus()
 });
-
 
 function cleanUrl(url,urlFormattingSettings) {
 	// Important, we have to strip the subdomain before the protocol since it relies on a protocol being present

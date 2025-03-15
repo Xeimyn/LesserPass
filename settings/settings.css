@@ -75,7 +75,7 @@ h1, h2, h3 {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	gap: 3vh;
+	gap: 2vh;
 	width: 25vw;
 	height: 80vh;
 	border: 2px white solid;
@@ -91,7 +91,22 @@ h2 {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 1vh;
+	gap: 0.8vh;
+}
+
+.focusSelect {
+	display: flex;
+	flex-direction: column;
+	/* align-items: center; */
+	justify-content: center;
+	width: 47%;
+}
+
+.focusselector {
+	background-color: black;
+	height: 25px;
+	color: white;
+	border: 2px solid white;
 }
 
 .switchContainer {
@@ -109,6 +124,24 @@ h2 {
 .toggleInput {
 	width: 20px;
 	accent-color: black;
+}
+
+.charset {
+	background-color: black;
+	height: 25px;
+	color: white;
+	border: 2px white solid;
+	width: 196%;
+	transform: translateX(-25%);
+}
+
+.patch {
+	transform: translateX(16%);
+}
+
+input:focus {
+	outline: none;
+	scale: 1.05;
 }
 
 /* SO to https://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-input-s-spin-box */
