@@ -1,153 +1,196 @@
-* {
-	margin: 0;
+:root {
+	--clr-background: black;
+	--clr-accent: white;
+	/* --- */
+	--border: 2px solid var(--clr-accent);
 }
+
+/* --- */
 
 body {
-	width: 100vw;
-	height: 100vh;
-	background-color: black;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
+	background-color: var(--clr-background);
+	height: 100%;
 }
 
-h1, h2, h3 {
-	color: white;
-	text-align: center;
-}
-
-.textInput {
+input[type="checkbox"] {
+	appearance: none;
+	width: 25px;
 	height: 25px;
-	background-color: black;
-	color: white;
-	border: 2px solid white;
-}
-
-.numberInput {
-	height: 25px;
-	text-align: center;
-	background-color: black;
-	color: white;
-	border: 2px solid white;
-}
-
-.minusButton {
+	background-color: var(--clr-background);
+	border: var(--border);
+	display: inline-block;
+	position: relative;
 	cursor: pointer;
-	background-color: transparent;
-	color: white;
+	transition: 100ms;
+}
+
+input[type="checkbox"]:checked::after {
+	content: "✔";
+	color: var(--clr-accent);
+	font-size: 23px;
 	position: absolute;
-	height: 27px;
-	width: 27px;
-	margin-top: 1px;
-	margin-left: 2px;
-	border: none;
-	font-size: 20pt;
-	text-align: center;
-	line-height: 25px;
-	z-index: 5;
+	top: 9px;
+	left: 11px;
+	transform: translate(-50%, -50%);
 }
 
-.plusButton {
-	cursor: pointer;
-	background-color: transparent;
-	color: white;
-	position: absolute;
-	height: 27px;
-	width: 27px;
-	margin-right: 2px;
-	margin-top: 1px;
-	border: none;
-	font-size: 18pt;
-	text-align: center;
-	line-height: 25px;
-	transform: translateX(-107%);
-	z-index: 5;
+input[type="checkbox"]:focus {
+	outline: none;
+	scale: 1.1;
 }
 
-.title {
-	font-size: 3vw;
-	margin-bottom: 3vh;
-}
-
-.Settings {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	gap: 2vh;
-	width: 25vw;
-	height: 80vh;
-	border: 2px white solid;
-}
-
-h2 {
-	text-decoration: underline;
-	font-size: 300%;
-}
-
-.urlFormatting,.defaultInputs,.miscSettings {
-	width: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 0.8vh;
-}
-
-.focusSelect {
-	display: flex;
-	flex-direction: column;
-	/* align-items: center; */
-	justify-content: center;
-	width: 47%;
-}
-
-.focusselector {
-	background-color: black;
+input[type="text"],input[type="number"] {
+	background-color: var(--clr-background);
+	color: var(--clr-accent);
+	border: var(--border);
 	height: 25px;
-	color: white;
-	border: 2px solid white;
-}
-
-.switchContainer {
-	width: 80%;
-	gap: 1vw;
-	display: flex;
-	justify-content: center;
-}
-
-.settingTitle {
-	text-align: left;
-	min-width: 150px;
-}
-
-.toggleInput {
-	width: 20px;
-	accent-color: black;
-}
-
-.charset {
-	background-color: black;
-	height: 25px;
-	color: white;
-	border: 2px white solid;
-	width: 196%;
-	transform: translateX(-25%);
-}
-
-.patch {
-	transform: translateX(16%);
+	transition: 100ms;
 }
 
 input:focus {
-	outline: none;
-	scale: 1.05;
+	outline: 0;
+	scale: 1.03;
 }
 
-/* SO to https://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-input-s-spin-box */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+/* --- */
+
+.mainTitle {
+	font-size: max(8vh,4vw);
+	color: var(--clr-accent);
+	margin: 0;
+	margin-bottom: 3vh;
+}
+
+/* This is the one that holds all settings boxes */
+.settingsContainer {
+	gap: 3vh;
+}
+
+.settingsBox {
+	display: flex;
+	flex-direction: column;
+	border: var(--border);
+	width: 33vw;
+	min-width: 300px;
+	padding: 2vmin;
+	gap: 10px;
+	border-radius: 15px;
+}
+
+.settingsBox::before {
+	position: absolute;
+	margin-top: -5vh;
+	margin-left: -0.3vw;
+	padding-left: 0.3vw;
+	padding-right: 0.3vw;
+	content: attr(sectionTitle); /* Holy shit this is sick af*/
+	color: var(--clr-accent);
+	background-color: var(--clr-background)	;
+	font-size: 20pt;
+	text-align: left;
+	user-select: none;
+}
+
+.Experimental {
+	--clr-accent: rgb(255, 17, 17);
+}
+
+/* --- */
+
+	.checkSettingContainer {
+		display: flex;
+		align-items: center;
+		gap: 0.5vw;
+	}
+
+	.checkLabel {
+		margin: 0;
+		font-size: max(1.7vh,1.5vw);
+		color: var(--clr-accent)
+	}
+
+/* --- */
+
+	.textSettingContainer {
+		display:flex;
+		flex-direction: column;
+		gap: 0.5vw;
+	}
+
+	.textLabel {
+		margin: 0;
+		font-size: max(1.7vh,1.5vw);
+		color: var(--clr-accent)
+	}
+
+/* --- */
+
+	.numberSettingContainer {
+		display:flex;
+		justify-content: space-evenly;
+	}
+
+	.numberLabel {
+		margin: 0;
+		font-size: max(1.7vh,1.5vw);
+		color: var(--clr-accent)
+	}
+
+	.numberSideBySideSpecial {
+		display: flex;
+		gap: 1vh;
+		flex-direction: column;
+	}
+
+	/* --- */
+
+	.textSettingContainer {
+		display: flex;
+		gap: 0.5vw;
+	}
+
+	.textLabel {
+		margin: 0;
+		font-size: max(1.7vh,1.5vw);
+		color: var(--clr-accent)
+	}
+
+	.charset {
+		background-color: var(--clr-background);
+		color: var(--clr-accent);
+		font-family: monospace;
+		font-size: 15pt;
+		resize: none;
+	}
+
+	.flexoverwrite {
+		flex-direction: column;
+	}
+
+/* --- */
+
+.selectSettingContainer {
+	display:flex;
+	flex-direction: column;
+}
+
+.selectLabel {
+	margin: 0;
+	font-size: max(1.7vh,1.5vw);
+	color: var(--clr-accent)
+}
+
+/* --- */
+
+.flex-side-side {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.flex-top-bottom {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
 }

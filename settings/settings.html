@@ -7,55 +7,55 @@
 		<link rel="stylesheet" href="settings.css">
 		<script src="settings.js" defer></script>
 	</head>
-	<body>
-		<h1 class="title">Settings</h1>
-		<div class="Settings">
-			<div class="urlFormatting">
-				<h2>URL Formatting</h2>
-					<div class="switchContainer">
-						<h3 class="settingTitle">Strip subdomain</h3>
-						<input type="checkbox" class="toggleInput" name="stripSubDomain" checked>
-					</div>
-					<div class="switchContainer">
-						<h3 class="settingTitle">Strip url path</h3>
-						<input type="checkbox" class="toggleInput" name="stripPath" checked>
-					</div>
-					<div class="switchContainer">
-						<h3 class="settingTitle">Strip url protocol</h3>
-						<input type="checkbox" class="toggleInput" name="stripProtocol" checked>
-					</div>
-			</div>
-			<div class="defaultInputs">
-				<h2>Default Input</h2>
-				<div class="inputContainer">
-					<h3 class="settingTitle">Default login</h3>
-					<input type="text" class="textInput" name="login" value="">
+	<body class="flex-top-bottom">
+		<h1 class="mainTitle">Settings</h1>
+		<div class="settingsContainer flex-top-bottom">
+			<div class="urlFormatting settingsBox" sectionTitle="URL formatting">
+				<div class="checkSettingContainer">
+					<input type="checkbox" id="stripSubDomain">
+					<h2 class="checkLabel" id="togSub" >Strip subdomain (subdoain.domain.com)</h2>
 				</div>
-				<div class="inputContainer">
-					<h3 class="settingTitle">Default password length</h3>
-					<button id="plusBL" class="minusButton">-</button>
-					<input type="number" class="numberInput" name="length" value="16">
-					<button id="plusBL" class="plusButton">+</button>
+				<div class="checkSettingContainer">
+					<input type="checkbox" id="stripPath">
+					<h2 class="checkLabel" id="togPath" >Strip path (domain.com/pa/th)</h2>
 				</div>
-				<div class="inputContainer">
-					<h3 class="settingTitle">Default password index</h3>
-					<button id="minusBI" class="minusButton">-</button>
-					<input type="number" class="numberInput" name="index" value="0">
-					<button id="plusBI" class="plusButton">+</button>
+				<div class="checkSettingContainer">
+					<input type="checkbox" id="stripProtocol">
+					<h2 class="checkLabel" id="togProt" >Strip protocol (protocol://domain.com)</h2>
 				</div>
 			</div>
-			<div class="miscSettings">
-				<h2>Miscellaneous</h2>
-				<div class="switchContainer">
-					<h3 class="settingTitle">Enable Autofill</h3>
-					<input type="checkbox" class="toggleInput" name="autofill" checked>
+			<div class="defaultInputs settingsBox" sectionTitle="Default inputs">
+				<div class="textSettingContainer">
+					<h2 class="textLabel">Default login</h2>
+					<input type="text" id="login">
 				</div>
-				<div class="switchContainer">
-					<h3 class="settingTitle">Show "Copied" overlay</h3>
+				<div class="numberSettingContainer">
+					<div class="numberSideBySideSpecial">
+						<h2 class="numberLabel">Default length</h2>
+						<input type="number" id="length" value="16">
+					</div>
+					<div class="numberSideBySideSpecial">
+						<h2 class="numberLabel">Default index</h2>
+						<input type="number" id="index" value="0">
+					</div>
+				</div>
+				<div class="textSettingContainer">
+					<h2 class="textLabel">Charset</h2>
+					<textarea class="charset" id="charset" rows="2"></textarea>
+				</div>
+			</div>
+			<!-- abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW0123456789!`&quot§$\%&/(){[]}=?'#.,;:<>|_- -->
+			<div class="settingsBox UISettings" sectionTitle="UI Settings">
+				<div class="checkSettingContainer">
 					<input type="checkbox" class="toggleInput" name="copiedOverlay" checked>
+					<h2 class="checkLabel" id="togProt" >Enable "Copied" overlay</h2>
 				</div>
-				<div class="inputContainer focusSelect">
-					<h3 class="settingTitle">UI auto focus</h3>
+				<div class="numberSettingContainer flexoverwrite">
+						<h2 class="numberLabel">"Coped!" overlay duration (ms)</h2>
+						<input type="number" class="toggleInput" id="copiedOverlayTime">
+					</div>
+				<div class="selectSettingContainer">
+					<h2 class="selectLabel">Which field should be autoselected</h2>
 					<select class="focusselector" name="focus">
 						<option value="Site">Site</option>
 						<option value="Login">Login</option>
@@ -65,11 +65,14 @@
 						<option value="None">None</option>
 					</select>
 				</div>
-				<div class="inputContainer">
-					<h3 class="patch settingTitle">Password charset</h3>
-					<input class="charset" type="text" name="charset" value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW0123456789!`&quot§$\%&/(){[]}=?'#.,;:<>|_-">
+			</div>
+			<div class="settingsBox Experimental" sectionTitle="Experimental">
+				<div class="checkSettingContainer">
+					<input type="checkbox" class="toggleInput" id="autofill">
+					<h2 class="checkLabel" id="togAuto">Enable Autofill (BETA)</h2>
 				</div>
 			</div>
+			<button class="save">Save Settings</button>
 		</div>
 	</body>
 </html>
