@@ -31,7 +31,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 		plusButtonIndex,
 	]
 
-	const SETTINGS = "placeholder"
+	let SETTINGS = JSON.parse(localStorage.getItem("LesserPassSettings"));
+	if (!SETTINGS) {
+		chrome.tabs.create({url:chrome.runtime.getURL("settings/settings.html")})
+	}
+
+	// Set values from settings
+	loginElement.value = SETTINGS.defaultInputs.defaultLogin
+	lengthElement.value = SETTINGS.defaultInputs.defaultLength
+	indexElement.value = SETTINGS.defaultInputs.defaultIndex
 
 	// used to gen a password if any of the inputs change
 	REACTIVE_ELEMTNTS.forEach(function(element) {
@@ -42,8 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 			const currentIndex = indexElement.value
 			const currentLength = lengthElement.value;
 
-			// TODO | Get chars from settings
-			const currentCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~"
+			const currentCharSet = SETTINGS.defaultInputs.charset
 
 			if (currentSite != "" && currentLogin != "" && currentMasterPassword != "" && Number(currentLength) >= 1 && Number(currentIndex)) {
 				let finalPW = await genPW(currentSite,currentLogin,currentMasterPassword,currentLength,currentIndex,currentCharSet)
@@ -114,12 +121,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 	})
 
 	function showOverlay() {
-		copiedOverlayElement.style.visibility = "visible"
-		setTimeout(() => {
-			copiedOverlayElement.style.visibility = "hidden"
-			// TODO | Add Delay as setting
-		}, 1250);
+		if (SETTINGS.uiSettings.copiedOverlay) {
+			copiedOverlayElement.style.visibility = "visible"
+			setTimeout(() => {
+				copiedOverlayElement.style.visibility = "hidden"
+			}, SETTINGS.uiSettings.copiedOverlayDuration);
+		}
 	}
+
 
 	function copyToClipboard(value) {
 		if (value != "") {
@@ -177,16 +186,33 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	// Get current tab URL
 	const [tab] = await chrome.tabs.query({active: true, lastFocusedWindow: true});
-	// TODO | Adjust settings stuff
-	// const cleanURL = cleanUrl(tab.url,SETTINGS.urlFormatting)
-	const cleanURL = tab.url
+	const cleanURL = cleanUrl(tab.url,SETTINGS.urlFormatting)
 
 	// insert url to url field
 	siteElement.value = cleanURL
-});
+
+	// Autofocus
+	if (SETTINGS.uiSettings.autoFocus != "None")
+		switch (SETTINGS.uiSettings.autoFocus) {
+			case "Site":
+				siteElement.focus()
+				break;
+			case "Login":
+				loginElement.focus()
+				break;
+			case "MasterPW":
+				masterPasswordElement.focus()
+				break;
+			case "PWLength":
+				lengthElement.focus()
+				break;
+			case "PWIndex":
+				indexElement.focus()
+				break;
+		}
+	});
 
 function cleanUrl(url,urlFormattingSettings) {
-	// TODO | Adjust settings stuff
 	// Important, we have to strip the subdomain before the protocol since it relies on a protocol being present
 	if (urlFormattingSettings.stripSubDomain) {
 		url = url.replace(/([a-zA-Z0-9-]+\.)+(?=[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/g, '')
