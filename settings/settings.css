@@ -52,6 +52,62 @@ input:focus {
 	scale: 1.03;
 }
 
+/* --- | Custom number input stuff below */
+
+/* SO to https://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-input-s-spin-box */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+input[type=number] {
+	text-align: center;
+	appearance: textfield; /* Standard */
+	-moz-appearance: textfield; /* Firefox */
+}
+
+.minusButton {
+	position: absolute;
+	background-color: transparent;
+	color: var(--clr-accent);
+	height: 27px;
+	width: 27px;
+	font-size: 20pt;
+	text-align: center;
+	border: none;
+	cursor: pointer;
+	z-index: 5;
+	/* 3 more sins.... im sorry */
+	line-height: 25px;
+	margin-top: 1px;
+	margin-left: 2px;
+}
+
+.plusButton {
+	position: absolute;
+	background-color: transparent;
+	color: var(--clr-accent);
+	height: 27px;
+	width: 27px;
+	font-size: 16pt;
+	text-align: center;
+	border: none;
+	cursor: pointer;
+	z-index: 5;
+	/* Another 4 */
+	margin-right: 2px;
+	margin-top: 2.5px;
+	line-height: 25px;
+	transform: translateX(-107%);
+}
+
+.minusButton:focus, .plusButton:focus {
+	outline: 0;
+	text-decoration: underline;
+}
+
 /* --- */
 
 .mainTitle {
@@ -149,22 +205,27 @@ input:focus {
 		gap: 0.5vw;
 	}
 
-	.textLabel {
-		margin: 0;
-		font-size: max(1.7vh,1.5vw);
-		color: var(--clr-accent)
-	}
-
 	.charset {
 		background-color: var(--clr-background);
 		color: var(--clr-accent);
 		font-family: monospace;
 		font-size: 15pt;
 		resize: none;
+		border: var(--border);
+	}
+
+	.charset:focus {
+		outline: none;
+		scale: 1.02;
 	}
 
 	.flexoverwrite {
 		flex-direction: column;
+	}
+
+	.fixme2 {
+		margin-top: 1vh;
+		width: 50%;
 	}
 
 /* --- */
@@ -172,12 +233,53 @@ input:focus {
 .selectSettingContainer {
 	display:flex;
 	flex-direction: column;
+	gap: 1vh;
 }
 
 .selectLabel {
 	margin: 0;
 	font-size: max(1.7vh,1.5vw);
 	color: var(--clr-accent)
+}
+
+.focusselector {
+	background-color: var(--clr-background);
+	color: var(--clr-accent);
+	height: 30px;
+	border: var(--border);
+	text-align: center;
+}
+
+.focusselector:focus {
+	outline: none;
+	scale: 1.03;
+}
+
+option {
+	background-color: var(--clr-background);
+	color: var(--clr-accent);
+}
+
+/* --- */
+
+.saveButton {
+	height: 30px;
+	background-color: var(--clr-background);
+	border: var(--border);
+	color: var(--clr-accent);
+	margin-bottom: 2vh;
+	scale: 1.4;
+}
+
+.saveButton:focus {
+	outline: none;
+	scale: 1.5;
+}
+
+/* --- */
+
+.checkLabel,.textLabel,.numberLabel,.selectLabel {
+	user-select: none;
 }
 
 /* --- */
