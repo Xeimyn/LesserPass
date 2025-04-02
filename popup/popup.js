@@ -212,6 +212,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 		}
 	});
 
+function autoFillPassword() {
+	// TODO | Add autofill again
+}
+
 function cleanUrl(url,urlFormattingSettings) {
 	// Important, we have to strip the subdomain before the protocol since it relies on a protocol being present
 	if (urlFormattingSettings.stripSubDomain) {
