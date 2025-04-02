@@ -3,69 +3,64 @@ document.addEventListener("DOMContentLoaded", async () => {
 	const siteElement           = document.getElementsByClassName("site")[0];
 	const loginElement          = document.getElementsByClassName("login")[0];
 	const masterPasswordElement = document.getElementsByClassName("masterPassword")[0];
-	const indexElement          = document.getElementsByClassName("indexInput")[0];
-	const lengthElement         = document.getElementsByClassName("lengthInput")[0];
+
 	const outputElement         = document.getElementsByClassName("output")[0];
 
+	const lengthElement = document.getElementById("LengthInput");
 	const minusButtonLength = document.getElementById("minusBL")
 	const plusButtonLength  = document.getElementById("plusBL")
 
+	const indexElement  = document.getElementById("IndexInput");
 	const minusButtonIndex = document.getElementById("minusBI")
 	const plusButtonIndex  = document.getElementById("plusBI")
 
 	const toggleViewButton      = document.getElementsByClassName("toggleViewButton")[0];
 	const toggleViewButtonImage = document.getElementsByClassName("toggleButtonImg")[0];
 
-	const copiedOverlay = document.getElementsByClassName("copiedOverlay")[0]
+	const copiedOverlayElement = document.getElementsByClassName("copiedOverlay")[0]
 
-	const defaultSettings = {
-		"urlFormatting": {
-			"stripSubDomain": true,
-			"stripPath"     : true,
-			"stripProtocol" : true
-		},
-		"defaultInput":{
-			"login"   : "",
-			"length"  : 16,
-			"index"   : 0,
-		},
-		"misc": {
-			"autofill": true,
-			"copiedOverlay": true,
-			"focus":null, // [site,login,masterpw,length,index,null]
-			"charset" : "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW0123456789!\"$%&()=?#.,<>|_-",
-		}
-	}
+	const REACTIVE_ELEMTNTS = [
+		siteElement,
+		loginElement,
+		masterPasswordElement,
+		lengthElement,
+		indexElement,
+		minusButtonLength,
+		plusButtonLength,
+		minusButtonIndex,
+		plusButtonIndex,
+	]
 
-	// TODO | get these from local storage
-	const settings = {
-		"urlFormatting": {
-			"stripSubDomain": true,
-			"stripPath"     : true,
-			"stripProtocol" : true
-		}
-	};
+	const SETTINGS = "placeholder"
 
 	// used to gen a password if any of the inputs change
-	[siteElement, loginElement, masterPasswordElement,indexElement,lengthElement].forEach(function(element) {
+	REACTIVE_ELEMTNTS.forEach(function(element) {
 		element.addEventListener("keyup", async function() {
-			const site = siteElement.value;
-			const login = loginElement.value;
-			const masterPassword = masterPasswordElement.value;
-			const index = indexElement.value
+			const currentSite = siteElement.value;
+			const currentLogin = loginElement.value;
+			const currentMasterPassword = masterPasswordElement.value;
+			const currentIndex = indexElement.value
+			const currentLength = lengthElement.value;
 
-			const length = lengthElement.value;
-			const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~"
+			// TODO | Get chars from settings
+			const currentCharSet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:'\",.<>?/`~"
 
-			if (site != "" && login != "" && masterPassword != "") {
-				let finalPW = await genPW(site,login,masterPassword,length,index,chars)
-				outputElement.value = finalPW
+			if (currentSite != "" && currentLogin != "" && currentMasterPassword != "" && Number(currentLength) >= 1 && Number(currentIndex)) {
+				let finalPW = await genPW(currentSite,currentLogin,currentMasterPassword,currentLength,currentIndex,currentCharSet)
+				if (finalPW == "") {
+					// TODO | Add error output visually
+					console.log("Crypto api is not supported or PBKDF2 failed");
+					return
+				} else {
+					outputElement.value = finalPW
+				}
 			} else {
 				outputElement.value = '';
 			}
 		});
 	 });
 
+	// Used to reveal/hide password
 	 toggleViewButton.addEventListener("click",function() {
 		if (outputElement.type == "password") {
 			outputElement.type = "text"
@@ -76,6 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		}
 	 })
 
+	// Used to make the custom number input buttons work
 	 minusButtonLength.addEventListener("click",function() {
 		if (lengthElement.value >= 2) {
 			lengthElement.value -=1
@@ -108,35 +104,42 @@ document.addEventListener("DOMContentLoaded", async () => {
 		}
 	});
 
+	// Click to copy functionallity
 	outputElement.addEventListener("click",function() {
 		copyToClipboard(outputElement.value)
 	})
 
+	copiedOverlayElement.addEventListener("click",function() {
+		copiedOverlayElement.style.visibility = "hidden"
+	})
+
 	function showOverlay() {
-		copiedOverlay.style.visibility = "visible"
+		copiedOverlayElement.style.visibility = "visible"
 		setTimeout(() => {
-			copiedOverlay.style.visibility = "hidden"
-		  }, 1250);
+			copiedOverlayElement.style.visibility = "hidden"
+			// TODO | Add Delay as setting
+		}, 1250);
 	}
 
 	function copyToClipboard(value) {
 		if (value != "") {
 			navigator.clipboard.writeText(value).then(() => {
-				console.log('Password copied to clipboard');
 				showOverlay()
+				console.log('[LesserPass] Password copied to clipboard');
 			}).catch(err => {
-				console.error('Could not copy text: ', err);
+				console.error('[LesserPass] Could not copy text: ', err);
 			});
 		} else {
-			console.log('Not gonna copy empty text')
+			console.log('[LesserPass] Not gonna copy empty text')
 		}
 	}
 
 	async function genPW(site, login, masterPassword, length, index, chars) {
 		const encoder = new TextEncoder();
-		const salt = encoder.encode(site + login + index); // Include index in the salt to ensure unique output per index
+		const salt = encoder.encode(site + login + index);
 
 		let derivedBits;
+
 		if (window.crypto.subtle.importKey && window.crypto.subtle.deriveBits) {
 			try {
 				// Generate key material from master password using PBKDF2
@@ -146,24 +149,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 				// Derive a 256-bit key using PBKDF2 with 310,000 iterations for security
 				derivedBits = await window.crypto.subtle.deriveBits(
-					{ name: "PBKDF2", salt: salt, iterations: 310000, hash: "SHA-256" },
+					{ name: "PBKDF2", salt: salt, iterations: 400000, hash: "SHA-256" },
 					keyMaterial, 256
 				);
 			} catch (error) {
-				console.warn("PBKDF2 failed, falling back to SHA-256.");
-
-				// Fallback: Directly hash the concatenated inputs using SHA-256
-				const data = encoder.encode(site + login + masterPassword + index);
-				const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-				derivedBits = new Uint8Array(hashBuffer);
+				console.warn("[LesserPass] PBKDF2 failed.");
+				return ""
 			}
-		} else {
-			console.warn("Crypto API not supported, using SHA-256 fallback.");
 
-			// Fallback: Directly hash the concatenated inputs using SHA-256
-			const data = encoder.encode(site + login + masterPassword + index);
-			const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-			derivedBits = new Uint8Array(hashBuffer);
+		} else {
+			console.warn("[LesserPass] Crypto API not supported.");
+			return ""
 		}
 
 		// Convert derived bits to an array of usable characters from the provided charset
@@ -181,14 +177,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	// Get current tab URL
 	const [tab] = await chrome.tabs.query({active: true, lastFocusedWindow: true});
-	const cleanURL = cleanUrl(tab.url,settings.urlFormatting)
-
+	// TODO | Adjust settings stuff
+	// const cleanURL = cleanUrl(tab.url,SETTINGS.urlFormatting)
+	const cleanURL = tab.url
 
 	// insert url to url field
 	siteElement.value = cleanURL
 });
 
 function cleanUrl(url,urlFormattingSettings) {
+	// TODO | Adjust settings stuff
 	// Important, we have to strip the subdomain before the protocol since it relies on a protocol being present
 	if (urlFormattingSettings.stripSubDomain) {
 		url = url.replace(/([a-zA-Z0-9-]+\.)+(?=[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/g, '')
@@ -201,13 +199,3 @@ function cleanUrl(url,urlFormattingSettings) {
 	}
 	return url
 }
-
-// // Send message to content script to autofill the password
-function autofillPassword(password) {
-	chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-	  chrome.tabs.sendMessage(tabs[0].id, {
-		action: "autofillPassword",
-		password: password
-	  });
-	});
-  }

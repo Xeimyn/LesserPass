@@ -8,37 +8,44 @@
 		<script src="popup.js" defer></script>
 	</head>
 	<body>
-		<div class="copiedOverlay">
+		<!-- Overlay -->
+		<div class="copiedOverlay flex-top-bottom">
 			<h1 class="overlayText">Copied!</h1>
 		</div>
-		<div class="titleSection sidebyside">
-			<img src="../assets/128x128.png" alt="A key with striked through eye in its bow." class="keyLogo">
+		<!-- Title Section -->
+		<div class="header flex-side-side">
+			<img class="keyLogo"
+				src="../assets/icon.svg"
+				alt="A key with a striked through eye in its bow."
+			>
 			<h2 class="title">LesserPass</h2>
 		</div>
-		<div class="form toponbottom">
-			<input type="text" placeholder="google.com" class="site">
-			<input type="text" placeholder="max@gmail.com" class="login">
-			<input type="text" placeholder="S3cur3P4ssw0rd1!" class="masterPassword">
-			<div class="quickSettings sidebyside">
-				<div class="numberInputContainer">
-					<button id="minusBL" class="minusButton">-</button>
-					<input type="number" min="1" value="16" placeholder="Length" class="lengthInput numberInput">
-					<button id="plusBL" class="plusButton">+</button>
+		<div class="userInputsContainer flex-top-bottom">
+			<input class="userInput site" type="text" placeholder="Site">
+			<input class="userInput login" type="text" placeholder="Login">
+			<input class="userInput masterPassword" type="password" placeholder="Master Password">
+			<div class="quickSettings flex-side-side">
+				<div>
+					<button class="minusButton" id="minusBL">-</button>
+					<!-- TODO | Remove the value since itll be auto'd from the settings -->
+					<input class="numberInput" id="LengthInput" type="number" min="1" placeholder="Length">
+					<button class="plusButton" id="plusBL">+</button>
 				</div>
-				<div class="numberInputContainer">
-					<button id="minusBI" class="minusButton">-</button>
-					<input type="number" min="0" value="0" placeholder="Index" class="indexInput numberInput">
-					<button id="plusBI" class="plusButton">+</button>
+				<div>
+					<button class="minusButton" id="minusBI">-</button>
+					<!-- TODO | Remove the value since itll be auto'd from the settings -->
+					<input class="numberInput" id="IndexInput" type="number" min="0" placeholder="Index">
+					<button class="plusButton" id="plusBI">+</button>
 				</div>
 			</div>
-			<div class="outputContainer sidebyside">
-				<input title="Click to copy" type="password" readonly class="output">
-				<button class="toggleViewButton">
-					<img src="../assets/icons/eye.svg" alt="Toggle View" class="toggleButtonImg">
+			<div class="outputContainer flex-side-side">
+				<input class="output" title="Click to copy" type="password" readonly>
+				<button class="toggleViewButton flex-top-bottom">
+					<img class="toggleButtonImg" src="../assets/icons/eye.svg" alt="Toggle View">
 				</button>
 			</div>
 		</div>
-		<div class="links sidebyside">
+		<div class="links flex-side-side">
 			<a href="../settings/settings.html" target="_blank" class="bottomLink">Settings</a>
 			<a href="https://github.com/Xeimyn/LesserPass" target="_blank" class="bottomLink">Source</a>
 			<!-- <a href="" class="bottomLink">Placeholder</a> -->

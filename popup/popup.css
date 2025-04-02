@@ -1,21 +1,30 @@
+:root {
+	--window-width: 250px;
+	--window-height: 320px;
+	/* --- */
+	--clr-background: black;
+	--clr-accent: white;
+	/* --- */
+	--border: 2px solid var(--clr-accent);
+	/* --- */
+	--title-size: 28pt;
+}
+
 html {
-	width: 250px;
-	height: 310px;
+	width: var(--window-width);
+	height: var(--window-heighth);
 }
 
 body {
 	margin: 0;
-	background-color: black;
-	border: 2px solid white;
+	background-color: var(--clr-background);
+	border: var(--border)
 }
 
-input {
-	height: 25px;
-	width: 80%;
-	background-color: black;
-	color: white;
-	border: 2px solid white;
-	transition: 100ms;
+input[type="text"],input[type="password"],input[type="number"] {
+	background-color: var(--clr-background);
+	color: var(--clr-accent);
+	border: var(--border);
 }
 
 input:focus {
@@ -28,147 +37,68 @@ button:focus {
 	text-decoration: underline;
 }
 
-/* --- */
-
-.sidebyside {
-	display: flex;
-	align-items: center;
-	justify-content: center;
+a:focus,a:hover{
+	outline: 0;
+	color: var(--clr-accent);
 }
 
-.toponbottom {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-direction: column;
+*::placeholder {
+	color: var(--clr-accent);
+	filter: brightness(60%);
 }
 
 /* --- */
 
-.titleSection {
-	width: 250px;
-	gap: 2.5vw;
-	transform: translateX(-10px);
+.header {
+	width: 100%;
+	height: 20%;
+	gap: 3vw;
+	padding-top: 3vh;
+	padding-bottom: 3vh;
 	user-select: none;
 }
 
 .keyLogo {
-	height: 16vw;
-	width: 16vw;
+	height: calc(var(--title-size) + 5px);
+	margin: 0;
+
+	/* This is a sin but it looks so much better */
+	transform: translateY(2px);
 }
 
 .title {
-	color: white;
-	font-size: 27pt;
-	text-align: center;
-	margin-left: -2.5vh;
-	margin-top: 3.5vh;
-	margin-bottom: 3.5vh;
+	font-size: var(--title-size);
+	color: var(--clr-accent);
+	margin: 0;
 }
 
-.form {
+/* --- */
+
+.userInputsContainer {
 	gap:3.5vh;
+
 }
+
+.userInput {
+	height: 25px;
+	width: 80%;
+	transition: 100ms;
+}
+
+/* --- */
 
 .quickSettings {
-	gap: 2vw;
-	width: 80%;
+	gap: 3.5vh;
 }
 
 .numberInput {
-	width: 92px;
+	height: 25px;
 	text-align: center;
+	width: 88px;
+	transition: 100ms;
 }
 
-.minusButton {
-	cursor: pointer;
-	background-color: transparent;
-	color: white;
-	position: absolute;
-	height: 27px;
-	width: 27px;
-	margin-top: 1px;
-	margin-left: 2px;
-	border: none;
-	font-size: 20pt;
-	text-align: center;
-	line-height: 25px;
-	z-index: 5;
-}
-
-.plusButton {
-	cursor: pointer;
-	background-color: transparent;
-	color: white;
-	position: absolute;
-	height: 27px;
-	width: 27px;
-	margin-right: 2px;
-	margin-top: 1px;
-	border: none;
-	font-size: 18pt;
-	text-align: center;
-	line-height: 25px;
-	transform: translateX(-107%);
-	z-index: 5;
-}
-
-.outputContainer {
-	width: 100%;
-	justify-content: center;
-}
-
-.output {
-	width: 67.5%;
-	cursor: copy;
-}
-
-.toggleViewButton{
-	background-color: transparent;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border: 2px solid white;
-	border-left: none;
-	width: 31px;
-	aspect-ratio: 1;
-	overflow: hidden;
-	cursor: pointer;
-}
-
-.toggleButtonImg {
-	filter: invert();
-	scale: 1.75;
-}
-
-.links {
-	gap: 10vw;
-	margin: 0;
-	margin-top: -5px;
-	height: 35px;
-}
-
-.bottomLink {
-	color: rgba(255, 255, 255, 0.8);
-}
-
-.copiedOverlay {
-	top: 0;
-	left: 0;
-	visibility: hidden;
-	background-color: hsla(0, 0%, 0%, 0.7);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	z-index: 10;
-}
-
-.overlayText {
-	color:white;
-}
+/* --- | Custom number input stuff below */
 
 /* SO to https://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-input-s-spin-box */
 input::-webkit-outer-spin-button,
@@ -181,4 +111,111 @@ input::-webkit-inner-spin-button {
 input[type=number] {
 	appearance: textfield; /* Standard */
 	-moz-appearance: textfield; /* Firefox */
+}
+
+.minusButton {
+	position: absolute;
+	background-color: transparent;
+	color: var(--clr-accent);
+	height: 27px;
+	width: 27px;
+	font-size: 20pt;
+	text-align: center;
+	border: none;
+	cursor: pointer;
+	z-index: 5;
+	/* 3 more sins.... im sorry */
+	line-height: 25px;
+	margin-top: 1px;
+	margin-left: 2px;
+}
+
+.plusButton {
+	position: absolute;
+	background-color: transparent;
+	color: var(--clr-accent);
+	height: 27px;
+	width: 27px;
+	font-size: 16pt;
+	text-align: center;
+	border: none;
+	cursor: pointer;
+	z-index: 5;
+	/* Another 4 */
+	margin-right: 2px;
+	margin-top: 2.5px;
+	line-height: 25px;
+	transform: translateX(-107%);
+}
+
+/* --- */
+
+.outputContainer {
+	width: 100%;
+}
+
+.output {
+	width: 66%;
+	height: 25px;
+	cursor: copy;
+	font-family: monospace;
+}
+
+.toggleViewButton{
+	width: 31px;
+	background-color: transparent;
+	aspect-ratio: 1;
+	border: var(--border);
+	border-left: none;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.toggleButtonImg {
+	filter: invert();
+	scale: 1.5;
+}
+
+/* --- */
+
+.links {
+	height: 35px;
+	margin-top: -5px;
+	gap: 10vw;
+}
+
+.bottomLink {
+	color: var(--clr-accent);
+	filter: brightness(80%);
+}
+
+.copiedOverlay {
+	visibility: hidden;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background-color: hsla(0, 0%, 0%, 0.7);
+	z-index: 10;
+}
+
+.overlayText {
+	color:var(--clr-accent);
+	font-size: 18vw;
+}
+
+/* --- */
+
+.flex-side-side {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.flex-top-bottom {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
 }
