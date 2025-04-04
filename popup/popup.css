@@ -88,23 +88,30 @@ a:focus,a:hover{
 /* --- */
 
 .passwordInput {
-	width: 100%;
+	width: 82%;
 }
 
 .emojiList {
 	user-select: none;
-	gap: 1vw;
-	right: 10vw;
-	margin-top: 10px;
-	position: absolute;
-	width: 65px;
+	margin: 0;
 	padding: 0;
+	height: 27px;
+	width: 90px;
+	gap: 1vw;
+	border: var(--border);
+	border-left: 0;
+	cursor: pointer;
+	/* remove list marker */
+	list-style: none;
 }
 
 .emoji {
-	font-size: 13pt;
-	/* filter: saturate(0); */
-	margin-left: -5px;
+	text-align: center;
+	color: var(--clr-accent);
+	width: 18px;
+	max-width: 18px;
+	font-size: 12pt;
+	filter: grayscale() brightness(125%);
 }
 
 /* --- */
