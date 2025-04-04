@@ -41,31 +41,40 @@ document.addEventListener("DOMContentLoaded", async () => {
 	lengthElement.value = SETTINGS.defaultInputs.defaultLength
 	indexElement.value = SETTINGS.defaultInputs.defaultIndex
 
+	// Function to regenerate password
+	async function regeneratePassword() {
+		const currentSite = siteElement.value;
+		const currentLogin = loginElement.value;
+		const currentMasterPassword = masterPasswordElement.value;
+		const currentIndex = indexElement.value;
+		const currentLength = lengthElement.value;
+
+		const currentCharSet = SETTINGS.defaultInputs.charset;
+
+		if (currentSite != "" && currentLogin != "" && currentMasterPassword != "" && Number(currentLength) >= 1 && Number(currentIndex)) {
+			let finalPW = await genPW(currentSite, currentLogin, currentMasterPassword, currentLength, currentIndex, currentCharSet);
+			if (finalPW == "") {
+				// TODO | Add error output visually
+				console.log("Crypto api is not supported or PBKDF2 failed");
+				return;
+			} else {
+				outputElement.value = finalPW;
+			}
+		} else {
+			outputElement.value = '';
+		}
+	}
+
 	// used to gen a password if any of the inputs change
 	REACTIVE_ELEMTNTS.forEach(function(element) {
-		element.addEventListener("keyup", async function() {
-			const currentSite = siteElement.value;
-			const currentLogin = loginElement.value;
-			const currentMasterPassword = masterPasswordElement.value;
-			const currentIndex = indexElement.value
-			const currentLength = lengthElement.value;
+		element.addEventListener("keyup", regeneratePassword);
+	});
 
-			const currentCharSet = SETTINGS.defaultInputs.charset
-
-			if (currentSite != "" && currentLogin != "" && currentMasterPassword != "" && Number(currentLength) >= 1 && Number(currentIndex)) {
-				let finalPW = await genPW(currentSite,currentLogin,currentMasterPassword,currentLength,currentIndex,currentCharSet)
-				if (finalPW == "") {
-					// TODO | Add error output visually
-					console.log("Crypto api is not supported or PBKDF2 failed");
-					return
-				} else {
-					outputElement.value = finalPW
-				}
-			} else {
-				outputElement.value = '';
-			}
-		});
-	 });
+	// Add event listeners for plus and minus buttons to trigger password regeneration
+	minusButtonLength.addEventListener("click", regeneratePassword);
+	plusButtonLength.addEventListener("click", regeneratePassword);
+	minusButtonIndex.addEventListener("click", regeneratePassword);
+	plusButtonIndex.addEventListener("click", regeneratePassword);
 
 	// Used to reveal/hide password
 	 toggleViewButton.addEventListener("click",function() {
@@ -93,11 +102,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 	 })
 
 	 minusButtonIndex.addEventListener("click",function() {
+		if (indexElement.value >= 2) {
+			indexElement.value -= 1
+		}
 		if (indexElement.value == "") {
 			indexElement.value = 1
-			return
 		}
-		indexElement.value -=1
 	 })
 
 	 plusButtonIndex.addEventListener("click",function() {
@@ -218,7 +228,7 @@ function autoFillPassword() {
 
 function cleanUrl(url,urlFormattingSettings) {
 	// Important, we have to strip the subdomain before the protocol since it relies on a protocol being present
-	if (urlFormattingSettings.stripSubDomain) {
+	if (urlFormattingSettings.stripSubdomain) {
 		url = url.replace(/([a-zA-Z0-9-]+\.)+(?=[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/g, '')
 	}
 	if (urlFormattingSettings.stripProtocol) {

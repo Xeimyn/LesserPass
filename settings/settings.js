@@ -68,12 +68,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 		defaultLengthElement.value = Number(defaultLengthElement.value) + 1
 	})
 
+
+
 	minusButtonIndex.addEventListener("click",function() {
+		if (defaultIndexElement.value >= 2) {
+			defaultIndexElement.value -= 1
+		}
 		if (defaultIndexElement.value == "") {
 			defaultIndexElement.value = 1
-			return
 		}
-		defaultIndexElement.value -=1
 	})
 
 	plusButtonIndex.addEventListener("click",function() {
