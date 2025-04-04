@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 	const toggleViewButton = getElementByClass("toggleViewButton");
 	const toggleViewButtonImage = getElementByClass("toggleButtonImg");
 	const copiedOverlayElement = getElementByClass("copiedOverlay");
+	const emojiListElement = getElementByClass("emojiList");
+	const emojiElements = document.getElementsByClassName("emoji");
 
 	const SETTINGS = JSON.parse(localStorage.getItem("LesserPassSettings")) || {};
 	if (!SETTINGS.defaultInputs) {
@@ -29,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		const { value: index } = indexElement;
 		const { charset } = SETTINGS.defaultInputs;
 
-		if (site && login && masterPassword && Number(length) >= 1 && Number(index)) {
+		if (site && login && masterPassword.length >= 1 && Number(length) >= 1 && Number(index)) {
 			const finalPW = await genPW(site, login, masterPassword, length, index, charset);
 			outputElement.value = finalPW;
 		} else {
@@ -45,10 +47,44 @@ document.addEventListener("DOMContentLoaded", async () => {
 	["minusBL", "plusBL", "minusBI", "plusBI"].forEach(id =>
 		document.getElementById(id).addEventListener("click", regeneratePassword));
 
+	masterPasswordElement.addEventListener("input", () => {
+		if (masterPasswordElement.value.length === 0) {
+			emojiElements[0].innerText = "-"
+			emojiElements[1].innerText = "-"
+			emojiElements[2].innerText = "-"
+			outputElement.value = "";
+			return
+		}
+
+		emojis = [
+			"🍒","🚽","🌊","🐶","👍","🐀","🌴","🍌", //8
+			"🍏","🔒","🍓","🎓","🎉","🐐","🔥","✋", // 16
+			"🤡","🤛","🐈","🚁","🔆","🌜","🔑","🎻",
+			"🚧","🏓","🎮","💜","💩","👽","👻","💀", // 32
+			"🐱‍👤","🦄","🐍","🐉","🦖","🐘","🦞","🦴",
+			"🦷","👀","👅","🦾","🦿","🧠","✨","🎉",
+			"💍","💎","🛒","🏆","🥇","🔊","🔧","📞",
+			"💣","🔍","📌","🍗","🍇","🥕","🚲","🚀"] // 64
+
+		// Get 3 emojis based on the password hash. Must be deterministic.
+		const hash = masterPasswordElement.value.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+		const emoji1 = emojis[hash % emojis.length];
+		const emoji2 = emojis[(hash * 2) % emojis.length];
+		const emoji3 = emojis[(hash * 3) % emojis.length];
+		emojiElements[0].innerText = emoji1;
+		emojiElements[1].innerText = emoji2;
+		emojiElements[2].innerText = emoji3;
+	})
+
 	toggleViewButton.addEventListener("click", () => {
 		const isPassword = outputElement.type === "password";
 		outputElement.type = isPassword ? "text" : "password";
 		toggleViewButtonImage.src = isPassword ? "../assets/icons/eye_blind.svg" : "../assets/icons/eye.svg";
+	});
+
+	emojiListElement.addEventListener("click", () => {
+		const isPassword = masterPasswordElement.type === "password";
+		masterPasswordElement.type = isPassword ? "text" : "password";
 	});
 
 	const adjustValue = (element, delta) => {
@@ -112,7 +148,7 @@ async function genPW(site, login, masterPassword, length, index, chars) {
 		);
 
 		const derivedBits = await window.crypto.subtle.deriveBits(
-			{ name: "PBKDF2", salt, iterations: 400000, hash: "SHA-256" }, keyMaterial, 256
+			{ name: "PBKDF2", salt, iterations: 300000, hash: "SHA-256" }, keyMaterial, 256
 		);
 
 		const hashArray = Array.from(new Uint8Array(derivedBits));
