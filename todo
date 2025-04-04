@@ -7,8 +7,6 @@ autologin gen
 - settings are a toggle anda input for a custom domain
 - idea is that it generated a (opt derived) login@customdomain.tld for the login instead of using the default one.
 
-steal lesspass triple emoji thingy
-- prob just use emojis instead of chars when gening pw type thing
-
-add strip port
-
+compat stuff
+- on install open settings
+- on update open settings

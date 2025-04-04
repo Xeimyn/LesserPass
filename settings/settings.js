@@ -9,6 +9,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 	const stripProtocolElement = document.getElementById("stripProtocol")
 	const stripProtocolLabelElement = document.getElementById("togProt")
 
+	const stripPortElement = document.getElementById("stripPort")
+	const stripPortLabelElement = document.getElementById("togPort")
+
 	const defaultLoginElement = document.getElementById("login")
 	const defaultLengthElement = document.getElementById("length")
 	const minusButtonLength = document.getElementById("minusBL")
@@ -52,6 +55,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	autoFillLabelElement.addEventListener("click", () => {
 		autoFillElement.checked = !autoFillElement.checked;
+	});
+
+	stripPortLabelElement.addEventListener("click", () => {
+		stripPortElement.checked = !stripPortElement.checked;
 	});
 
 // Used to make the custom number input buttons work
@@ -117,6 +124,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	stripSubdomainElement.checked = settings.urlFormatting.stripSubdomain;
 	stripPathElement.checked = settings.urlFormatting.stripPath;
 	stripProtocolElement.checked = settings.urlFormatting.stripProtocol;
+	stripPortElement.checked = settings.urlFormatting.stripPort;
 	defaultLoginElement.value = settings.defaultInputs.defaultLogin;
 	defaultLengthElement.value = settings.defaultInputs.defaultLength;
 	defaultIndexElement.value = settings.defaultInputs.defaultIndex;
@@ -126,13 +134,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 	autoFocusElement.value = settings.uiSettings.autoFocus; // Set the select element value
 	autoFillElement.checked = settings.experimentalSettings.autoFill;
 
+
 	// Save settings when the save button is clicked
 	saveButton.addEventListener("click", () => {
 		const updatedSettings = {
 			urlFormatting: {
 				stripSubdomain: stripSubdomainElement.checked,
 				stripPath: stripPathElement.checked,
-				stripProtocol: stripProtocolElement.checked
+				stripProtocol: stripProtocolElement.checked,
+				stripPort: stripPortElement.checked
 			},
 			defaultInputs: {
 				defaultLogin: defaultLoginElement.value,

@@ -167,5 +167,6 @@ function cleanUrl(url, settings) {
 	if (settings?.stripSubdomain) url = url.replace(/([a-zA-Z0-9-]+\.)+(?=[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/g, '');
 	if (settings?.stripProtocol) url = url.replace(/^([a-zA-Z\d+\-.]*):\/\//, '');
 	if (settings?.stripPath) url = url.replace(/\/.*$/, '');
+	if (settings?.stripPort) url = url.replace(/:\d+$/, '');
 	return url;
 }
