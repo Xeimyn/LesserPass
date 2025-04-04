@@ -13,27 +13,22 @@ function detectPasswordElements() {
 }
 
 // Observe DOM changes to detect dynamically loaded password fields
-// const observer = new MutationObserver(() => {
-// 	detectPasswordElements();
-// });
+const observer = new MutationObserver(() => {
+	detectPasswordElements();
+});
 
 // Start observing the document body for changes
-// observer.observe(document.body, { childList: true, subtree: true });
+observer.observe(document.body, { childList: true, subtree: true });
 
 // Initial detection
-// document.addEventListener("DOMContentLoaded", () => {
-// 	detectPasswordElements();
-// });
-
-// // Just making sure it runs at LEAST once
-// setTimeout(() => {
-// 	detectPasswordElements()
-// }, 3000);
+document.addEventListener("DOMContentLoaded", () => {
+	detectPasswordElements();
+});
 
 // Listen for messages from extension ui to autofill
-// chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-// 	if (request.action === "autofillPassword") {
-// 		detectPasswordElements();
-// 		finalPasswordElement.value = request.password;
-// 	}
-// });
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+	if (request.action === "autofillPassword") {
+		detectPasswordElements();
+		finalPasswordElement.value = request.password;
+	}
+});
