@@ -142,12 +142,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	function copyToClipboard(value) {
 		if (value != "") {
-			navigator.clipboard.writeText(value).then(() => {
-				showOverlay()
-				console.log('[LesserPass] Password copied to clipboard');
-			}).catch(err => {
-				console.error('[LesserPass] Could not copy text: ', err);
-			});
+			if (SETTINGS.experimentalSettings.autoFill) {
+				autoFillPassword(value)
+			} else {
+				navigator.clipboard.writeText(value).then(() => {
+					showOverlay()
+					console.log('[LesserPass] Password copied to clipboard');
+				}).catch(err => {
+					console.error('[LesserPass] Could not copy text: ', err);
+				});
+			}
 		} else {
 			console.log('[LesserPass] Not gonna copy empty text')
 		}
@@ -222,8 +226,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 		}
 	});
 
-function autoFillPassword() {
-	// TODO | Add autofill again
+function autoFillPassword(value) {
+	chrome.runtime.sendMessage({action:"autofillPassword",password:value})
 }
 
 function cleanUrl(url,urlFormattingSettings) {
