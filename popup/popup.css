@@ -87,6 +87,28 @@ a:focus,a:hover{
 
 /* --- */
 
+.passwordInput {
+	width: 100%;
+}
+
+.emojiList {
+	user-select: none;
+	gap: 1vw;
+	right: 10vw;
+	margin-top: 10px;
+	position: absolute;
+	width: 65px;
+	padding: 0;
+}
+
+.emoji {
+	font-size: 13pt;
+	/* filter: saturate(0); */
+	margin-left: -5px;
+}
+
+/* --- */
+
 .quickSettings {
 	gap: 3.5vh;
 }
