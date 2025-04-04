@@ -1,0 +1,14 @@
+autofill needs work
+- shadow roots fuck it up
+- somehow the messaging bs dosent work
+- adding a button is hella annoying
+
+autologin gen
+- settings are a toggle anda input for a custom domain
+- idea is that it generated a (opt derived) login@customdomain.tld for the login instead of using the default one.
+
+steal lesspass triple emoji thingy
+- prob just use emojis instead of chars when gening pw type thing
+
+add strip port
+
