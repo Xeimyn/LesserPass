@@ -148,7 +148,7 @@ async function genPW(site, login, masterPassword, length, index, chars) {
 		);
 
 		const derivedBits = await window.crypto.subtle.deriveBits(
-			{ name: "PBKDF2", salt, iterations: 300000, hash: "SHA-256" }, keyMaterial, 256
+			{ name: "PBKDF2", salt, iterations: 1000000, hash: "SHA-256" }, keyMaterial, 256
 		);
 
 		const hashArray = Array.from(new Uint8Array(derivedBits));
