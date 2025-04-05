@@ -23,29 +23,39 @@ document.addEventListener("DOMContentLoaded", async () => {
 	lengthElement.value = SETTINGS.defaultInputs.defaultLength;
 	indexElement.value = SETTINGS.defaultInputs.defaultIndex;
 
+	const debounce = (func, delay) => {
+		let debounceTimer;
+		return function() {
+			const context = this;
+			const args = arguments;
+			clearTimeout(debounceTimer);
+			debounceTimer = setTimeout(() => func.apply(context, args), delay);
+		};
+	};
+
 	const regeneratePassword = async () => {
 		const { value: site } = siteElement;
 		const { value: login } = loginElement;
 		const { value: masterPassword } = masterPasswordElement;
 		const { value: length } = lengthElement;
 		const { value: index } = indexElement;
-		const { charset } = SETTINGS.defaultInputs;
+		const { charset, iterations } = SETTINGS.defaultInputs;
 
 		if (site && login && masterPassword.length >= 1 && Number(length) >= 1 && Number(index)) {
-			const finalPW = await genPW(site, login, masterPassword, length, index, charset);
+			const finalPW = await genPW(site, login, masterPassword, length, index, charset, iterations);
 			outputElement.value = finalPW;
 		} else {
 			outputElement.value = "";
 		}
 	};
 
-	// 45
+	const debouncedRegeneratePassword = debounce(regeneratePassword, 300);
 
 	[siteElement, loginElement, masterPasswordElement, lengthElement, indexElement].forEach(element =>
-		element.addEventListener("keyup", regeneratePassword));
+		element.addEventListener("keyup", debouncedRegeneratePassword));
 
 	["minusBL", "plusBL", "minusBI", "plusBI"].forEach(id =>
-		document.getElementById(id).addEventListener("click", regeneratePassword));
+		document.getElementById(id).addEventListener("click", debouncedRegeneratePassword));
 
 	masterPasswordElement.addEventListener("input", () => {
 		if (masterPasswordElement.value.length === 0) {
@@ -138,9 +148,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 	}
 });
 
-async function genPW(site, login, masterPassword, length, index, chars) {
+async function genPW(site, login, masterPassword, length, index, chars, iterations) {
 	const encoder = new TextEncoder();
 	const salt = encoder.encode(site + login + index);
+
+	if (iterations < 300000) {
+		alert("Warning: PBKDF2 iterations are below the recommended minimum of 300000. This may compromise security.");
+	}
 
 	try {
 		const keyMaterial = await window.crypto.subtle.importKey(
@@ -148,7 +162,7 @@ async function genPW(site, login, masterPassword, length, index, chars) {
 		);
 
 		const derivedBits = await window.crypto.subtle.deriveBits(
-			{ name: "PBKDF2", salt, iterations: 1000000, hash: "SHA-256" }, keyMaterial, 256
+			{ name: "PBKDF2", salt, iterations, hash: "SHA-256" }, keyMaterial, 256
 		);
 
 		const hashArray = Array.from(new Uint8Array(derivedBits));

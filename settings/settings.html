@@ -55,6 +55,19 @@
 					<h2 class="textLabel">Charset</h2>
 					<textarea class="charset" id="charset" rows="2"></textarea>
 				</div>
+				<div class="numberSettingContainer">
+					<div class="numberSideBySideSpecial">
+						<h2 class="numberLabel">PBKDF2 Iterations</h2>
+						<div class="customNumberInput">
+							<button class="minusButton" id="minusIter">-</button>
+							<input type="number" id="iterations" min="1">
+							<button class="plusButton" id="plusIter">+</button>
+						</div>
+					</div>
+				</div>
+				<div class="warningMessage" id="warningMessage" style="display: none; color: red;">
+					Warning: PBKDF2 iterations are below 300000. This may compromise security.
+				</div>
 			</div>
 			<!-- abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW0123456789!`&quot§$\%&/(){[]}=?'#.,;:<>|_- -->
 			<div class="settingsBox UISettings" sectionTitle="UI Settings">
