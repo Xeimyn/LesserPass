@@ -23,6 +23,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 	lengthElement.value = SETTINGS.defaultInputs.defaultLength;
 	indexElement.value = SETTINGS.defaultInputs.defaultIndex;
 
+	const debounce = (func, delay) => {
+		let debounceTimer;
+		return function() {
+			const context = this;
+			const args = arguments;
+			clearTimeout(debounceTimer);
+			debounceTimer = setTimeout(() => func.apply(context, args), delay);
+		};
+	};
+
 	const regeneratePassword = async () => {
 		const { value: site } = siteElement;
 		const { value: login } = loginElement;
@@ -39,13 +49,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 		}
 	};
 
-	// 45
+	const debouncedRegeneratePassword = debounce(regeneratePassword, 300);
 
 	[siteElement, loginElement, masterPasswordElement, lengthElement, indexElement].forEach(element =>
-		element.addEventListener("keyup", regeneratePassword));
+		element.addEventListener("keyup", debouncedRegeneratePassword));
 
 	["minusBL", "plusBL", "minusBI", "plusBI"].forEach(id =>
-		document.getElementById(id).addEventListener("click", regeneratePassword));
+		document.getElementById(id).addEventListener("click", debouncedRegeneratePassword));
 
 	masterPasswordElement.addEventListener("input", () => {
 		if (masterPasswordElement.value.length === 0) {
@@ -141,6 +151,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function genPW(site, login, masterPassword, length, index, chars, iterations) {
 	const encoder = new TextEncoder();
 	const salt = encoder.encode(site + login + index);
+
+	if (iterations < 300000) {
+		alert("Warning: PBKDF2 iterations are below the recommended minimum of 300000. This may compromise security.");
+	}
 
 	try {
 		const keyMaterial = await window.crypto.subtle.importKey(

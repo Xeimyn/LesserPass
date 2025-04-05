@@ -92,10 +92,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 		if (iterationsElement.value == "") {
 			iterationsElement.value = 50000
 		}
+		if (iterationsElement.value < 300000) {
+			document.getElementById("warningMessage").style.display = "block";
+		} else {
+			document.getElementById("warningMessage").style.display = "none";
+		}
 	})
 
 	plusButtonIterations.addEventListener("click",function() {
 		iterationsElement.value = Number(iterationsElement.value) + 50000
+		if (iterationsElement.value < 300000) {
+			document.getElementById("warningMessage").style.display = "block";
+		} else {
+			document.getElementById("warningMessage").style.display = "none";
+		}
 	})
 
 	const defaultSettings = {
@@ -140,6 +150,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 	copiedOverlayMSDurationElement.value = settings.uiSettings.copiedOverlayDuration;
 	autoFocusElement.value = settings.uiSettings.autoFocus;
 	autoFillElement.checked = settings.experimentalSettings.autoFill;
+
+	if (iterationsElement.value < 300000) {
+		document.getElementById("warningMessage").style.display = "block";
+	} else {
+		document.getElementById("warningMessage").style.display = "none";
+	}
 
 	saveButton.addEventListener("click", () => {
 		const updatedSettings = {
