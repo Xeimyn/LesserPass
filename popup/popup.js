@@ -29,10 +29,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 		const { value: masterPassword } = masterPasswordElement;
 		const { value: length } = lengthElement;
 		const { value: index } = indexElement;
-		const { charset } = SETTINGS.defaultInputs;
+		const { charset, iterations } = SETTINGS.defaultInputs;
 
 		if (site && login && masterPassword.length >= 1 && Number(length) >= 1 && Number(index)) {
-			const finalPW = await genPW(site, login, masterPassword, length, index, charset);
+			const finalPW = await genPW(site, login, masterPassword, length, index, charset, iterations);
 			outputElement.value = finalPW;
 		} else {
 			outputElement.value = "";
@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	}
 });
 
-async function genPW(site, login, masterPassword, length, index, chars) {
+async function genPW(site, login, masterPassword, length, index, chars, iterations) {
 	const encoder = new TextEncoder();
 	const salt = encoder.encode(site + login + index);
 
@@ -148,7 +148,7 @@ async function genPW(site, login, masterPassword, length, index, chars) {
 		);
 
 		const derivedBits = await window.crypto.subtle.deriveBits(
-			{ name: "PBKDF2", salt, iterations: 1000000, hash: "SHA-256" }, keyMaterial, 256
+			{ name: "PBKDF2", salt, iterations, hash: "SHA-256" }, keyMaterial, 256
 		);
 
 		const hashArray = Array.from(new Uint8Array(derivedBits));

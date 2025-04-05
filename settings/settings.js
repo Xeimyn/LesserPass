@@ -1,4 +1,3 @@
-// Gets called when the window opens.
 document.addEventListener("DOMContentLoaded", async () => {
 	const stripSubdomainElement = document.getElementById("stripSubdomain")
 	const stripSubdomainLabelElement = document.getElementById("togSub")
@@ -30,13 +29,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 	const autoFillElement = document.getElementById("autoFill")
 	const autoFillLabelElement = document.getElementById("togAuto")
 
-// ---
+	const iterationsElement = document.getElementById("iterations")
+	const minusButtonIterations = document.getElementById("minusIter")
+	const plusButtonIterations = document.getElementById("plusIter")
 
 	const saveButton = document.getElementsByClassName("saveButton")[0]
 
-// ---
-
-// Add click event listeners for labels to toggle corresponding inputs
 	stripSubdomainLabelElement.addEventListener("click", () => {
 		stripSubdomainElement.checked = !stripSubdomainElement.checked;
 	});
@@ -61,7 +59,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 		stripPortElement.checked = !stripPortElement.checked;
 	});
 
-// Used to make the custom number input buttons work
 	minusButtonLength.addEventListener("click",function() {
 		if (defaultLengthElement.value >= 2) {
 			defaultLengthElement.value -=1
@@ -74,8 +71,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	plusButtonLength.addEventListener("click",function() {
 		defaultLengthElement.value = Number(defaultLengthElement.value) + 1
 	})
-
-
 
 	minusButtonIndex.addEventListener("click",function() {
 		if (defaultIndexElement.value >= 2) {
@@ -90,7 +85,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 		defaultIndexElement.value = Number(defaultIndexElement.value) + 1
 	})
 
-	// Define structured default settings
+	minusButtonIterations.addEventListener("click",function() {
+		if (iterationsElement.value >= 50000) {
+			iterationsElement.value -= 50000
+		}
+		if (iterationsElement.value == "") {
+			iterationsElement.value = 50000
+		}
+	})
+
+	plusButtonIterations.addEventListener("click",function() {
+		iterationsElement.value = Number(iterationsElement.value) + 50000
+	})
+
 	const defaultSettings = {
 		urlFormatting: {
 			stripSubdomain: true,
@@ -101,26 +108,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 			defaultLogin: "",
 			defaultLength: 16,
 			defaultIndex: 1,
-			charset: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!`\"§$\%&/(){[]}=?'#.,;:<>|_-"
+			charset: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!`\"§$\%&/(){[]}=?'#.,;:<>|_-",
+			iterations: 1000000
 		},
 		uiSettings: {
 			copiedOverlay: true,
 			copiedOverlayDuration: 1250,
-			autoFocus: "None" // Default value for the select element
+			autoFocus: "None"
 		},
 		experimentalSettings: {
 			autoFill: false
 		}
 	};
 
-	// Load settings from localStorage or use default settings
 	let settings = JSON.parse(localStorage.getItem("LesserPassSettings"));
 	if (!settings) {
 		settings = defaultSettings;
 		localStorage.setItem("LesserPassSettings", JSON.stringify(settings));
 	}
 
-	// Apply settings to the UI
 	stripSubdomainElement.checked = settings.urlFormatting.stripSubdomain;
 	stripPathElement.checked = settings.urlFormatting.stripPath;
 	stripProtocolElement.checked = settings.urlFormatting.stripProtocol;
@@ -129,13 +135,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 	defaultLengthElement.value = settings.defaultInputs.defaultLength;
 	defaultIndexElement.value = settings.defaultInputs.defaultIndex;
 	charsetElement.value = settings.defaultInputs.charset;
+	iterationsElement.value = settings.defaultInputs.iterations;
 	copiedOverlayElement.checked = settings.uiSettings.copiedOverlay;
 	copiedOverlayMSDurationElement.value = settings.uiSettings.copiedOverlayDuration;
 	autoFocusElement.value = settings.uiSettings.autoFocus;
 	autoFillElement.checked = settings.experimentalSettings.autoFill;
 
-
-	// Save settings when the save button is clicked
 	saveButton.addEventListener("click", () => {
 		const updatedSettings = {
 			urlFormatting: {
@@ -148,7 +153,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 				defaultLogin: defaultLoginElement.value,
 				defaultLength: Number(defaultLengthElement.value),
 				defaultIndex: Number(defaultIndexElement.value),
-				charset: charsetElement.value
+				charset: charsetElement.value,
+				iterations: Number(iterationsElement.value)
 			},
 			uiSettings: {
 				copiedOverlay: copiedOverlayElement.checked,
@@ -163,5 +169,4 @@ document.addEventListener("DOMContentLoaded", async () => {
 		localStorage.setItem("LesserPassSettings", JSON.stringify(updatedSettings));
 		alert("Settings saved!");
 	});
-
 });
