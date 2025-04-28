@@ -97,10 +97,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 	document.getElementById("plusBI").addEventListener("click", () => adjustValue(indexElement, 1));
 
 	masterPasswordElement.addEventListener("keydown", (event) => {
-		if (event.key === "Enter") copyToClipboard(outputElement.value);
+		if (event.key === "Enter") takeActionBasedOnSettings(outputElement.value);
 	});
 
-	outputElement.addEventListener("click", () => copyToClipboard(outputElement.value));
+	outputElement.addEventListener("click", () => takeActionBasedOnSettings(outputElement.value));
 
 	copiedOverlayElement.addEventListener("click", () => {
 		copiedOverlayElement.style.visibility = "hidden";
@@ -113,17 +113,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 		}
 	};
 
+	const takeActionBasedOnSettings = (value) => {
+		if (SETTINGS.experimentalSettings?.autoFill) {
+			autoFillPassword(value)
+		} else {
+			copyToClipboard(value)
+		}
+	}
+
 	const copyToClipboard = (value) => {
 		if (!value) return console.log('[LesserPass] Not gonna copy empty text');
-		if (SETTINGS.experimentalSettings?.autoFill) return autoFillPassword(value);
-
 		navigator.clipboard.writeText(value).then(() => {
 			showOverlay();
 			console.log('[LesserPass] Password copied to clipboard');
 		}).catch(err => console.error('[LesserPass] Could not copy text: ', err));
 	};
 
-	const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+	const [tab] = await chrome.tabs.query({ active: true,});
 	siteElement.value = cleanUrl(tab.url, SETTINGS.urlFormatting);
 
 	if (SETTINGS.uiSettings?.autoFocus) {
@@ -160,7 +166,8 @@ async function genPW(site, login, masterPassword, length, index, chars) {
 }
 
 function autoFillPassword(value) {
-	chrome.runtime.sendMessage({ action: "autofillPassword", password: value });
+	console.log("autofilling"); // TODO | Liar, its not filling the auto (idk why)
+	chrome.runtime.sendMessage({ action: "fillPassword", password: value });
 }
 
 function cleanUrl(url, settings) {
