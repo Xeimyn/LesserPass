@@ -80,8 +80,6 @@ setTimeout(() => {
 // Listen for messages from extension ui to autofill
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	if (request.action === "fillPassword") {
-		console.log("Test");
-
 		try {
 			finalPasswordElement.value = request.password;
 		} catch (error) {

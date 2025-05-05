@@ -129,7 +129,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 		}).catch(err => console.error('[LesserPass] Could not copy text: ', err));
 	};
 
-	const [tab] = await chrome.tabs.query({ active: true,});
+
+	let [ tab ] = await chrome.tabs.query({currentWindow:true,active:true})
+	if (!tab.url) {
+		// when i get the tab passed from background.js it doesent have a url so i have to re-get it.
+		const tab = await chrome.tabs.query({index:tab.index})
+	}
+
+	// const [tab] = await chrome.tabs.query({ active: true,});
 	siteElement.value = cleanUrl(tab.url, SETTINGS.urlFormatting);
 
 	if (SETTINGS.uiSettings?.autoFocus) {
@@ -166,7 +173,6 @@ async function genPW(site, login, masterPassword, length, index, chars) {
 }
 
 function autoFillPassword(value) {
-	console.log("autofilling"); // TODO | Liar, its not filling the auto (idk why)
 	chrome.runtime.sendMessage({ action: "fillPassword", password: value });
 }
 
