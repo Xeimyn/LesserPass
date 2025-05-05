@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	charsetElement.value = settings.defaultInputs.charset;
 	copiedOverlayElement.checked = settings.uiSettings.copiedOverlay;
 	copiedOverlayMSDurationElement.value = settings.uiSettings.copiedOverlayDuration;
-	autoFocusElement.value = settings.uiSettings.autoFocus; // Set the select element value
+	autoFocusElement.value = settings.uiSettings.autoFocus;
 	autoFillElement.checked = settings.experimentalSettings.autoFill;
 
 
