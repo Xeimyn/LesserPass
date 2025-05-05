@@ -74,14 +74,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	masterPasswordElement.addEventListener("keydown", (event) => {
 		if (masterPasswordElement.value.length >= 1 && event.key === "Enter") {
-			if (SETTINGS.experimentalSettings.autoFill) {
-				// TODO | Autofill.... filling lol
+			// if (SETTINGS.experimentalSettings.autoFill) {
 				// 1. Ask background.js to ask content.js if it has a password field to fill, and pass along the password
 				//  for it to do so. If yes, wait for the response. If true, it filled; otherwise, there was no field,
 				// so copy the password.
-			} else {
+			// } else {
 				copyToClipboard(outputElement.value,copiedOverlayElement,SETTINGS);
-			}
+			// }
 		}
 	});
 
@@ -132,6 +131,7 @@ async function genPW(site, login, masterPassword, length, index, chars) {
 		);
 
 		const derivedBits = await window.crypto.subtle.deriveBits(
+			// TODO | Add Setting for iterations
 			{ name: "PBKDF2", salt, iterations: 300000, hash: "SHA-256" }, keyMaterial, 256
 		);
 
@@ -164,6 +164,7 @@ async function regeneratePassword(SETTINGS, siteElement, loginElement, masterPas
 
 function updateEmojiPreview(masterPasswordElement, emojiElements) {
 	if (masterPasswordElement.value.length >= 0) {
+		// TODO | Add setting to choose your own emojis.
 		const emojis = [
 			"🍒","🚽","🌊","🐶","👍","🐀","🌴","🍌",
 			"🍏","🔒","🍓","🎓","🎉","🐐","🔥","✋",
