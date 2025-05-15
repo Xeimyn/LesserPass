@@ -1,5 +1,6 @@
 var iHaveAElementToFill = false
-
+let observer = null;
+let finalPasswordElement = null;
 
 function addLesserPassButton(passwordFieldElement) {
 	let fillFieldHeight = passwordFieldElement.getBoundingClientRect().height
@@ -7,6 +8,7 @@ function addLesserPassButton(passwordFieldElement) {
 
 	// Create and style button including the icon
 	const autoFillButton = document.createElement("button");
+	autoFillButton.className = "lesserpass-autofill-btn";
 
 	autoFillButton.style.position = "absolute";
 	autoFillButton.style.left = `${passwordFieldElement.offsetLeft + passwordFieldElement.offsetWidth - buttonSize - (fillFieldHeight * 0.1)}px`;
@@ -41,48 +43,72 @@ function addLesserPassButton(passwordFieldElement) {
 	// Add button to DOM
 	autoFillButton.appendChild(autoFillIcon);
 	passwordFieldElement.parentElement.appendChild(autoFillButton);
+	finalPasswordElement = passwordFieldElement
 }
 
 // Detect password element
+function isVisibleAndEnabled(element) {
+	// Check if element is visible and enabled for interaction
+	const style = window.getComputedStyle(element);
+	return (
+		style.display !== "none" &&
+		style.visibility !== "hidden" &&
+		style.opacity !== "0" &&
+		!element.disabled &&
+		!element.readOnly &&
+		element.offsetParent !== null
+	);
+}
+
 function identifyPasswordField() {
-	// Usually devs should specify that a field is a password autofill field.
-	let potentialPasswordElements = document.querySelectorAll('input[type="password"][autocomplete="current-password"]');
-	// But if they don’t we can still look for a normal field of TYPE password
-	if (potentialPasswordElements.length == 0) {
-		potentialPasswordElements = document.querySelectorAll('input[type="password"]');
-	}
-	// If that did nothing there is no field, but if there is we add the LesserPass button to the first one we see.
-	if (potentialPasswordElements.length >= 1) {
-		iHaveAElementToFill = true
-		addLesserPassButton(potentialPasswordElements[0]);
+    // Find password fields
+    let potentialPasswordElements = document.querySelectorAll('input[type="password"][autocomplete="current-password"]');
+    if (potentialPasswordElements.length === 0) {
+        potentialPasswordElements = document.querySelectorAll('input[type="password"]');
+    }
+    const visiblePasswordElements = Array.from(potentialPasswordElements).filter(isVisibleAndEnabled);
 
-	} else {
-		// if we found nothing, proceed to keep a watch on the dom
-	}
-		// Observe DOM changes to detect dynamically loaded password fields
-		const observer = new MutationObserver(() => {
-			observer.disconnect()
-			identifyPasswordField();
-		});
+    if (visiblePasswordElements.length >= 1) {
+        iHaveAElementToFill = true;
+        const passwordField = visiblePasswordElements[0];
+        // Only add button if not already present or if field changed
+        if (!passwordField.parentElement.querySelector('.lesserpass-autofill-btn') || finalPasswordElement !== passwordField) {
+            removeLesserPassButtons(); // Remove any old buttons
+            addLesserPassButton(passwordField);
+            finalPasswordElement = passwordField;
+        }
+    } else {
+        iHaveAElementToFill = false;
+        removeLesserPassButtons();
+        finalPasswordElement = null;
+    }
+}
 
-		observer.observe(document.body, { childList: true,});
+// Remove all LesserPass buttons
+function removeLesserPassButtons() {
+    document.querySelectorAll('.lesserpass-autofill-btn').forEach(btn => btn.remove());
 }
 
 // Listen for messages from extension ui to autofill
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	if (request.action === "fillPassword") {
-		try {
+		if (iHaveAElementToFill) {
 			finalPasswordElement.value = request.password;
-		} catch (error) {
-			console.log("whoops");
+			sendResponse(true)
+			}
+		} else {
+			sendResponse(false)
 		}
 	}
-});
+);
 
-// FIELD DETECTION BELOW
-
-// Initial detection
+// Set up a single observer on DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
-	identifyPasswordField();
-
+    identifyPasswordField();
+    if (!observer) {
+        observer = new MutationObserver(() => {
+            identifyPasswordField();
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
 });
