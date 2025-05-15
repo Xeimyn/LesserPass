@@ -72,17 +72,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 		document.getElementById(id).addEventListener("click", triggerRegeneration)
 	);
 
-	masterPasswordElement.addEventListener("keydown", (event) => {
+	masterPasswordElement.addEventListener("keydown",async (event) => {
 		if (masterPasswordElement.value.length >= 1 && event.key === "Enter") {
-			// if (SETTINGS.experimentalSettings.autoFill) {
-				// TODO | Autofill.... filling lol
-				// 1. Ask background.js to ask content.js if it has a password field to fill, and pass along the password
-				//  for it to do so. If yes, wait for the response. If true, it filled; otherwise, there was no field,
-				// so copy the password.
-
-			// } else {
+			if (SETTINGS.experimentalSettings.autoFill) {
+				const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+				chrome.tabs.sendMessage(tab.id,{ action: "fillPassword", password: outputElement.value }, (response) => {
+					if (response) {
+						console.log("[LesserPass] Password filled in.");
+					} else {
+						copyToClipboard(outputElement.value, copiedOverlayElement, SETTINGS);
+					}
+				})
+			} else {
 				copyToClipboard(outputElement.value,copiedOverlayElement,SETTINGS);
-			// }
+			}
 		}
 	});
 
@@ -160,11 +163,12 @@ async function regeneratePassword(SETTINGS, siteElement, loginElement, masterPas
 		outputElement.value = password;
 	} else {
 		outputElement.value = "";
+		updateEmojiPreview(masterPasswordElement, emojiElements);
 	}
 }
 
 function updateEmojiPreview(masterPasswordElement, emojiElements) {
-	if (masterPasswordElement.value.length >= 0) {
+	if (masterPasswordElement.value.length > 0) {
 		const emojis = [
 			"🍒","🚽","🌊","🐶","👍","🐀","🌴","🍌",
 			"🍏","🔒","🍓","🎓","🎉","🐐","🔥","✋",
