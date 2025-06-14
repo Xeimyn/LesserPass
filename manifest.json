@@ -1,10 +1,10 @@
 {
 	"name": "LesserPass",
-	"version": "0.9.6",
+	"version": "0.9.7",
 	"description": "Opiniated spiritual fork of LessPass",
 	"manifest_version": 3,
 	"author": "Xeimyn",
-	"permissions": ["activeTab"],
+	"permissions": ["activeTab","storage"],
 	"icons": {
 		"16": "assets/16x16.png",
 		"48": "assets/48x48.png",
