@@ -1,5 +1,10 @@
 // Gets called when the window opens.
 document.addEventListener("DOMContentLoaded", async () => {
+
+	const incognitoBanner = document.getElementsByClassName("incognitoBanner")[0]
+
+//  ---
+
 	const stripSubdomainElement = document.getElementById("stripSubdomain")
 	const stripSubdomainLabelElement = document.getElementById("togSub")
 
@@ -35,6 +40,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 	const saveButton = document.getElementsByClassName("saveButton")[0]
 
 // ---
+
+// remove "hide" class from incognito banner if the extension cant access incognito windows
+	const canAccessIncognito = await chrome.extension.isAllowedIncognitoAccess()
+	console.log(incognitoBanner);
+	console.log(canAccessIncognito);
+
+	if (! canAccessIncognito) {
+		incognitoBanner.classList.remove("hide");
+	}
 
 // Add click event listeners for labels to toggle corresponding inputs
 	stripSubdomainLabelElement.addEventListener("click", () => {

@@ -8,12 +8,15 @@
 		<script src="settings.js" defer></script>
 	</head>
 	<body class="flex-top-bottom">
+		<div class="incognitoBanner hide">
+			<h2 class="incognitoText">You may want to toggle the setting to use LesserPass in incognito windows: "chrome://extensions" -> LesserPass -> Details -> Allow in Incognito</h2>
+		</div>
 		<h1 class="mainTitle">Settings</h1>
 		<div class="settingsContainer flex-top-bottom">
 			<div class="urlFormatting settingsBox" sectionTitle="URL formatting">
 				<div class="checkSettingContainer">
 					<input type="checkbox" id="stripSubdomain">
-					<h2 class="checkLabel" id="togSub" >Strip subdomain (subdoain.domain.com)</h2>
+					<h2 class="checkLabel" id="togSub" >Strip subdomain (subdomain.domain.com)</h2>
 				</div>
 				<div class="checkSettingContainer">
 					<input type="checkbox" id="stripPath">
