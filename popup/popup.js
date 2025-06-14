@@ -211,17 +211,40 @@ function copyToClipboard(text,copiedOverlayElement,SETTINGS) {
 
 // Small but important thingy
 function cleanUrl(url, urlFormattingSettings) {
-	if (urlFormattingSettings.stripSubdomain) {
-		url = url.replace(/([a-zA-Z0-9-]+\.)+(?=[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/g, '');
+	// To avoud edge cases, remove trailing slashes
+	while (url.endsWith('/')) {
+		url = url.slice(0, -1);
 	}
+
+	let partsToRemove = []
 	if (urlFormattingSettings.stripProtocol) {
-		url = url.replace(/^([a-zA-Z\d+\-.]*):\/\//, '');
+		partsToRemove.push(url.match(/^([a-zA-Z\d+\-.]*):\/\//)[0])
 	}
-	if (urlFormattingSettings.stripPath) {
-		url = url.replace(/\/.*$/, '');
+
+	if (urlFormattingSettings.stripSubdomain) {
+		partsToRemove.push(url.match(/([a-zA-Z0-9-]+\.)+(?=[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/g))
 	}
+
 	if (urlFormattingSettings.stripPort) {
-		url = url.replace(/:\d+$/, '');
+		partsToRemove.push(url.match(/:\d+/))
+	}
+
+	if (urlFormattingSettings.stripPath) {
+		let path = url.match(/^(?:.+?:\/\/)?[^\/?#]+(\/(?!\/).*)$/)
+		if (path != null) {
+			partsToRemove.push(path[1])
+		} else {
+			// im doing this so that the log output stays consistent
+			partsToRemove.push(null)
+		}
+	}
+
+	console.log("Url in parts: ",partsToRemove);
+	// remove all matches
+	for (const match of partsToRemove) {
+		if (match) {
+			url = url.replace(match, '');
+		}
 	}
 	return url;
 }
