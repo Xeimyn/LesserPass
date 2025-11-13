@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	const copiedOverlayElement = getElementByClass("copiedOverlay");
 	const emojiPreviewElement = getElementByClass("emojiList");
 	const emojiElements = document.getElementsByClassName("emoji");
+	const quickNumberSettingElements = document.getElementsByClassName("quickNumberSetting");
 
 	// And also no matter what, we GOTTA load the settings
 	const SETTINGS = JSON.parse(localStorage.getItem("LesserPassSettings")) || {};
@@ -52,7 +53,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 		document.getElementById(id).addEventListener("click", handler);
 	}
 
-	// Now we need some event listeners so that the generated password changes when the options change.
 	const triggerRegeneration = () => regeneratePassword(
 		SETTINGS,
 		siteElement,
@@ -63,6 +63,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 		outputElement,
 		emojiElements
 	);
+
+	for (let index = 0; index < quickNumberSettingElements.length; index++) {
+		const element = quickNumberSettingElements[index];
+		// Add scroll event listener while hovered
+		element.addEventListener("wheel", (event) => {
+			event.preventDefault();
+			const delta = event.deltaY < 0 ? 1 : -1;
+			const inputElement = element.getElementsByClassName("numberInput")[0];
+			adjustValue(inputElement, delta);
+			triggerRegeneration();
+		});
+	}
+
+	// Now we need some event listeners so that the generated password changes when the options change.
 
 	[siteElement, loginElement, masterPasswordElement, lengthElement, indexElement].forEach(element =>
 		element.addEventListener("keyup", triggerRegeneration)
