@@ -42,6 +42,26 @@
 					<input class="numberInput" id="IndexInput" type="number" min="1" placeholder="Index">
 					<button class="plusButton" id="plusBI">+</button>
 				</div>
+				<details class="filtersContainer">
+					<summary class="filterHeader">
+						Apply filters
+						<button class="helpFiltersButton">(?)</button>
+					</summary>
+					<div class="filters flex-side-side">
+						<div class="filterToggle flex-top-bottom">
+							<h3 class="">a-z</h3>
+							<input type="checkbox" name="" id="" checked></div>
+						<div class="filterToggle flex-top-bottom">
+							<h3 class="">A-Z</h3>
+							<input type="checkbox" name="" id="" checked></div>
+						<div class="filterToggle flex-top-bottom">
+							<h3 class="">0-9</h3>
+							<input type="checkbox" name="" id="" checked></div>
+						<div class="filterToggle flex-top-bottom">
+							<h3 class="">!$?</h3>
+							<input type="checkbox" name="" id="" checked></div>
+					</div>
+				</details>
 			</div>
 			<div class="outputContainer flex-side-side">
 				<input class="output" title="Click to copy" type="password" readonly>
