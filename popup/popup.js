@@ -1,19 +1,18 @@
 document.addEventListener("DOMContentLoaded", async () => {
-	// Making my life slightly easier lol
-	const getElementByClass = (className) => document.getElementsByClassName(className)[0];
-
 	// No matter what, we need to know our ui elements n shit
-	const siteElement = getElementByClass("site");
-	const loginElement = getElementByClass("login");
-	const masterPasswordElement = getElementByClass("masterPassword");
-	const lengthElement = document.getElementById("LengthInput");
-	const indexElement = document.getElementById("IndexInput");
-	const outputElement = getElementByClass("output");
-	const toggleViewButton = getElementByClass("toggleViewButton");
-	const toggleViewButtonImage = getElementByClass("toggleButtonImg");
-	const copiedOverlayElement = getElementByClass("copiedOverlay");
-	const emojiPreviewElement = getElementByClass("emojiList");
-	const emojiElements = document.getElementsByClassName("emoji");
+	const EL_overlay = document.getElementById("copiedOverlay");
+	const EL_site = document.getElementById("site");
+	const EL_login = document.getElementById("login");
+	const EL_masterpw = document.getElementById("masterpw");
+	const EL_passMojiContainer = document.getElementsByClassName("passMojiContainer")[0];
+	const ListOf_EL_passMojis = document.getElementsByClassName("emoji");
+	const EL_length = document.getElementById("LengthInput");
+	const EL_index = document.getElementById("IndexInput");
+	const EL_output = document.getElementById("output");
+
+	const EL_toggleView = document.getElementById("toggleView");
+	const EL_toggleViewImg = document.getElementById("toggleViewImage");
+
 	const quickNumberSettingElements = document.getElementsByClassName("quickNumberSetting");
 
 	// And also no matter what, we GOTTA load the settings
@@ -25,28 +24,30 @@ document.addEventListener("DOMContentLoaded", async () => {
 	}
 
 	// ---
+
 	// Before doing anything, establish function of buttons n shit
-	toggleViewButton.addEventListener("click", () => {
-		const isPassword = outputElement.type === "password";
-		outputElement.type = isPassword ? "text" : "password";
-		toggleViewButtonImage.src = isPassword ? "../assets/icons/eye_blind.svg" : "../assets/icons/eye.svg";
+	EL_toggleView.addEventListener("click", () => {
+		const isPassword = EL_output.type === "password";
+		EL_output.type = isPassword ? "text" : "password";
+		EL_toggleViewImg.src = isPassword ? "../assets/icons/eye_blind.svg" : "../assets/icons/eye.svg";
 	});
 
-	emojiPreviewElement.addEventListener("click", () => {
-		const isPassword = masterPasswordElement.type === "password";
-		masterPasswordElement.type = isPassword ? "text" : "password";
+	EL_passMojiContainer.addEventListener("click", () => {
+		const isPassword = EL_masterpw.type === "password";
+		EL_masterpw.type = isPassword ? "text" : "password";
 	});
 
 	// ---
+
 	const adjustValue = (element, delta) => {
 		element.value = Math.max(1, (Number(element.value) || 1) + delta);
 	};
 
 	const adjustListeners = [
-		["minusBL", () => adjustValue(lengthElement, -1)],
-		["plusBL", () => adjustValue(lengthElement, 1)],
-		["minusBI", () => adjustValue(indexElement, -1)],
-		["plusBI", () => adjustValue(indexElement, 1)],
+		["minusLength", () => adjustValue(EL_length, -1)],
+		["plusLength", () => adjustValue(EL_length, 1)],
+		["minusIndex", () => adjustValue(EL_index, -1)],
+		["plusIndex", () => adjustValue(EL_index, 1)],
 	];
 
 	for (const [id, handler] of adjustListeners) {
@@ -55,13 +56,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	const triggerRegeneration = () => regeneratePassword(
 		SETTINGS,
-		siteElement,
-		loginElement,
-		masterPasswordElement,
-		lengthElement,
-		indexElement,
-		outputElement,
-		emojiElements
+		EL_site,
+		EL_login,
+		EL_masterpw,
+		EL_length,
+		EL_index,
+		EL_output,
+		ListOf_EL_passMojis
 	);
 
 	for (let index = 0; index < quickNumberSettingElements.length; index++) {
@@ -78,63 +79,63 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	// Now we need some event listeners so that the generated password changes when the options change.
 
-	[siteElement, loginElement, masterPasswordElement, lengthElement, indexElement].forEach(element =>
+	[EL_site, EL_login, EL_masterpw, EL_length, EL_index].forEach(element =>
 		element.addEventListener("keyup", triggerRegeneration)
 	);
 
-	["minusBL", "plusBL", "minusBI", "plusBI"].forEach(id =>
+	["minusLength", "plusLength", "minusIndex", "plusIndex"].forEach(id =>
 		document.getElementById(id).addEventListener("click", triggerRegeneration)
 	);
 
-	masterPasswordElement.addEventListener("keydown",async (event) => {
-		if (masterPasswordElement.value.length >= 1 && event.key === "Enter") {
+	EL_masterpw.addEventListener("keydown",async (event) => {
+		if (EL_masterpw.value.length >= 1 && event.key === "Enter") {
 			if (SETTINGS.experimentalSettings.autoFill) {
 				const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-				chrome.tabs.sendMessage(tab.id,{ action: "fillPassword", password: outputElement.value }, (response) => {
+				chrome.tabs.sendMessage(tab.id,{ action: "fillPassword", password: EL_output.value }, (response) => {
 					if (response) {
 						console.log("[LesserPass] Password filled in.");
 					} else {
-						copyToClipboard(outputElement.value, copiedOverlayElement, SETTINGS);
+						copyToClipboard(EL_output.value, EL_overlay, SETTINGS);
 					}
 				})
 			} else {
-				copyToClipboard(outputElement.value,copiedOverlayElement,SETTINGS);
+				copyToClipboard(EL_output.value,EL_overlay,SETTINGS);
 			}
 		}
 	});
 
 	// No matter what, clicking that field with the copy cursor should always copy.
-	outputElement.addEventListener("click", () => copyToClipboard(outputElement.value,copiedOverlayElement,SETTINGS));
+	EL_output.addEventListener("click", () => copyToClipboard(EL_output.value,EL_overlay,SETTINGS));
 
 	// Let the user dismiss the overlay by clicking it
-	copiedOverlayElement.addEventListener("click", () => {
-		copiedOverlayElement.style.visibility = "hidden";
+	EL_overlay.addEventListener("click", () => {
+		EL_overlay.style.visibility = "hidden";
 	});
 
 	// This is like filling out the easy parts of the test
-	loginElement.value = SETTINGS.defaultInputs.defaultLogin;
-	lengthElement.value = SETTINGS.defaultInputs.defaultLength;
-	indexElement.value = SETTINGS.defaultInputs.defaultIndex;
+	EL_login.value = SETTINGS.defaultInputs.defaultLogin;
+	EL_length.value = SETTINGS.defaultInputs.defaultLength;
+	EL_index.value = SETTINGS.defaultInputs.defaultIndex;
 
 	// Set site here
 	chrome.runtime.sendMessage({ action: "getOpenedViaButton" }, async (response) => {
 		if (response[0] === true) {
-			siteElement.value = cleanUrl(response[1], SETTINGS.urlFormatting);
+			EL_site.value = cleanUrl(response[1], SETTINGS.urlFormatting);
 			chrome.runtime.sendMessage({ action: "resetOpenedViaButton" });
 		} else {
 			const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-			siteElement.value = cleanUrl(tab.url, SETTINGS.urlFormatting);
+			EL_site.value = cleanUrl(tab.url, SETTINGS.urlFormatting);
 		}
 	});
 
 	// This is a bit dirty but...
 	if (SETTINGS.uiSettings?.autoFocus) {
 		const focusMap = {
-			"Site": siteElement,
-			"Login": loginElement,
-			"MasterPW": masterPasswordElement,
-			"PWLength": lengthElement,
-			"PWIndex": indexElement,
+			"Site": EL_site,
+			"Login": EL_login,
+			"MasterPW": EL_masterpw,
+			"PWLength": EL_length,
+			"PWIndex": EL_index,
 		};
 		focusMap[SETTINGS.uiSettings.autoFocus]?.focus();
 	}

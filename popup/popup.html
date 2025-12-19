@@ -9,70 +9,70 @@
 	</head>
 	<body>
 		<!-- Overlay -->
-		<div class="copiedOverlay flex-top-bottom">
-			<h1 class="overlayText">Copied!</h1>
+		<div id="copiedOverlay" class="overlay hidden flex-top-bottom nslct">
+			<h1>Copied!</h1>
 		</div>
 		<!-- Title Section -->
-		<div class="header flex-side-side">
-			<img class="keyLogo"
-				src="../assets/icon.svg"
+		<div class="header flex-side-side nslct">
+			<img src="../assets/icon.svg"
 				alt="A key with a striked through eye in its bow."
-			>
-			<h2 class="title">LesserPass</h2>
+				>
+			<h2>LesserPass</h2>
 		</div>
 		<div class="userInputsContainer flex-top-bottom">
-			<input class="userInput site" type="text" placeholder="Site">
-			<input class="userInput login" type="text" placeholder="Login">
-			<div class="passwordInput flex-side-side">
-				<input class="userInput masterPassword" type="password" placeholder="Master Password">
-				<ol class="emojiList flex-side-side">
-					<li class="emoji e1">-</li>
-					<li class="emoji e2">-</li>
-					<li class="emoji e3">-</li>
+			<input placeholder="Site" id="site" type="text" >
+			<input placeholder="Login" id="login" type="text" >
+			<div class="passwordEntry flex-side-side">
+				<input  placeholder="Master Password" id="masterpw" type="password">
+				<ol class="passMojiContainer flex-side-side nslct">
+					<li class="emoji monoMoji">-</li>
+					<li class="emoji monoMoji">-</li>
+					<li class="emoji monoMoji">-</li>
 				</ol>
 			</div>
-			<div class="quickSettings flex-side-side">
-				<div class="quickNumberSetting">
-					<button class="minusButton" id="minusBL">-</button>
-					<input class="numberInput" id="LengthInput" type="number" min="1" placeholder="Length">
-					<button class="plusButton" id="plusBL">+</button>
+			<div class="quickSettingsContainer flex-side-side">
+				<div class="numberSettingContainer">
+					<button class="numberInputButton minus" id="minusLength">-</button>
+					<input id="LengthInput" type="number" min="1" placeholder="Length">
+					<button class="numberInputButton plus" id="plusLength">+</button>
 				</div>
-				<div class="quickNumberSetting">
-					<button class="minusButton" id="minusBI">-</button>
-					<input class="numberInput" id="IndexInput" type="number" min="1" placeholder="Index">
-					<button class="plusButton" id="plusBI">+</button>
+				<div class="numberSettingContainer">
+					<button class="numberInputButton minus" id="minusIndex">-</button>
+					<input id="IndexInput" type="number" min="1" placeholder="Index">
+					<button class="numberInputButton plus" id="plusIndex">+</button>
 				</div>
-				<details class="filtersContainer">
-					<summary class="filterHeader">
+
+				<details class="quickFilters">
+					<summary>
 						Apply filters
-						<button class="helpFiltersButton">(?)</button>
+						<button id="helpButton">(?)</button>
 					</summary>
-					<div class="filters flex-side-side">
-						<div class="filterToggle flex-top-bottom">
-							<h3 class="">a-z</h3>
+					<div class="filterContainer flex-side-side">
+						<div class="flex-top-bottom">
+							<h3 class="filterLabel">a-z</h3>
 							<input type="checkbox" name="" id="" checked></div>
-						<div class="filterToggle flex-top-bottom">
-							<h3 class="">A-Z</h3>
+						<div class="flex-top-bottom">
+							<h3 class="filterLabel">A-Z</h3>
 							<input type="checkbox" name="" id="" checked></div>
-						<div class="filterToggle flex-top-bottom">
-							<h3 class="">0-9</h3>
+						<div class="flex-top-bottom">
+							<h3 class="filterLabel">0-9</h3>
 							<input type="checkbox" name="" id="" checked></div>
-						<div class="filterToggle flex-top-bottom">
-							<h3 class="">!$?</h3>
+						<div class="flex-top-bottom">
+							<h3 class="filterLabel">!$?</h3>
 							<input type="checkbox" name="" id="" checked></div>
 					</div>
 				</details>
 			</div>
 			<div class="outputContainer flex-side-side">
-				<input class="output" title="Click to copy" type="password" readonly>
-				<button class="toggleViewButton flex-top-bottom">
-					<img class="toggleButtonImg" src="../assets/icons/eye.svg" alt="Toggle View">
+				<input title="Click to copy" id="output" type="password" readonly>
+				<button id="toggleView" class="flex-top-bottom">
+					<img id="toggleViewImage" src="../assets/icons/eye.svg" alt="Toggle View">
 				</button>
 			</div>
 		</div>
-		<div class="links flex-side-side">
-			<a href="../settings/settings.html" target="_blank" class="bottomLink">Settings</a>
-			<a href="https://github.com/Xeimyn/LesserPass" target="_blank" class="bottomLink">Source</a>
+		<div class="footer flex-side-side">
+			<a href="../settings/settings.html" target="_blank">Settings</a>
+			<a href="https://github.com/Xeimyn/LesserPass" target="_blank">Source</a>
 			<!-- <a href="" class="bottomLink">Placeholder</a> -->
 		</div>
 	</body>

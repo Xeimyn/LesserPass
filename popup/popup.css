@@ -5,10 +5,12 @@
 	--clr-background: black;
 	--clr-accent: white;
 	/* --- */
-	--border: 2px solid var(--clr-accent);
-	/* --- */
 	--title-size: 28pt;
+	--border: 2px solid var(--clr-accent);
+	--overlay-transparency: 0.7
 }
+
+/* --- General window styling */
 
 html {
 	width: var(--window-width);
@@ -21,33 +23,30 @@ body {
 	border: var(--border)
 }
 
-input[type="text"],input[type="password"],input[type="number"] {
-	background-color: var(--clr-background);
-	color: var(--clr-accent);
-	border: var(--border);
+/* --- Overlay */
+
+.overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: hsla(0, 0%, 0%, var(--overlay-transparency));
+	/* Always on top */
+	z-index: 999;
 }
 
-input:focus {
-	outline: 0;
-	scale: 1.05;
+.hidden {
+	visibility: hidden;
 }
 
-button:focus {
-	outline: 0;
-	text-decoration: underline;
+.overlay > h1 {
+	color:var(--clr-accent);
+	font-size: 18vw;
 }
 
-a:focus,a:hover{
-	outline: 0;
-	color: var(--clr-accent);
-}
 
-*::placeholder {
-	color: var(--clr-accent);
-	filter: brightness(60%);
-}
-
-/* --- */
+/* --- Header */
 
 .header {
 	width: 100%;
@@ -55,10 +54,9 @@ a:focus,a:hover{
 	gap: 3vw;
 	padding-top: 4vw;
 	padding-bottom: 4vw;
-	user-select: none;
 }
 
-.keyLogo {
+.header > img {
 	height: calc(var(--title-size) + 5px);
 	margin: 0;
 
@@ -66,33 +64,45 @@ a:focus,a:hover{
 	transform: translateY(2px);
 }
 
-.title {
+.header > h2 {
 	font-size: var(--title-size);
 	color: var(--clr-accent);
 	margin: 0;
 }
 
-/* --- */
+/* User inputs */
+
+/* General styling */
+input[type="text"],input[type="password"],input[type="number"] {
+	background-color: var(--clr-background);
+	color: var(--clr-accent);
+	border: var(--border);
+}
 
 .userInputsContainer {
 	gap: 4vw;
-
 }
 
-.userInput {
+.userInputsContainer > input[type="text"] {
 	height: 25px;
 	width: 80%;
 	transition: 100ms;
 }
 
-/* --- */
-
-.passwordInput {
+.passwordEntry {
 	width: 82%;
 }
 
-.emojiList {
-	user-select: none;
+.passwordEntry > input[type="password"],
+.passwordEntry > input[type="text"] {
+	height: 25px;
+	width: 82%;
+	transition: 100ms;
+}
+
+/* --- Password feedback (emojis) */
+
+.passMojiContainer {
 	margin: 0;
 	padding: 0;
 	height: 27px;
@@ -100,117 +110,165 @@ a:focus,a:hover{
 	gap: 1vw;
 	border: var(--border);
 	border-left: 0;
+	/* Indicate the hidden feature that clicking will toggle masterpw visibillity */
+	/* TODO | Add a tooltop someday */
 	cursor: pointer;
 	/* remove list marker */
 	list-style: none;
 }
 
-.emoji {
+.passMojiContainer > li {
+	width: 18px;
+	font-size: 12pt;
 	text-align: center;
 	color: var(--clr-accent);
-	width: 18px;
-	max-width: 18px;
-	font-size: 12pt;
-	filter: grayscale() brightness(125%);
 }
 
-/* --- */
+.monoMoji {
+	/* TODO | Offer a setting for non monochrome passmojis */
+	filter: grayscale(100%) brightness(125%);
+}
 
-.quickSettings {
+/* --- Quick Settings */
+
+.quickSettingsContainer {
 	gap: 4vw;
 	flex-wrap: wrap;
 }
 
-.numberInput {
-	height: 25px;
-	text-align: center;
-	width: 88px;
-	transition: 100ms;
-}
-
-/* --- | Custom number input stuff below */
-
+/* --- Custom number inputs */
+/* Getting rid of the default + and - buttons */
 /* SO to https://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-input-s-spin-box */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+	/* display: none;         <- Crashes Chrome on hover */
+	-webkit-appearance: none;
+	margin: 0; /*             <-- Apparently some margin are still there even though it's hidden */
 }
 
-input[type=number] {
+.numberSettingContainer > input[type="number"] {
+	height: 25px;
+	width: 88px;
+	text-align: center;
+	transition: 100ms;
+	/* Overwriting some default styling */
 	appearance: textfield; /* Standard */
 	-moz-appearance: textfield; /* Firefox */
 }
 
-.minusButton {
+.numberInputButton {
 	position: absolute;
-	background-color: transparent;
-	color: var(--clr-accent);
 	height: 27px;
 	width: 27px;
-	font-size: 20pt;
+	background-color: transparent;
+	color: var(--clr-accent);
 	text-align: center;
 	border: none;
 	cursor: pointer;
-	z-index: 5;
-	/* 3 more sins.... im sorry */
+	/* if the actual number input gets focus it shoves itself infront of the buttons */
+	z-index: 2;
+}
+
+/* A bit hacky here but depending on minus or plus different stylings look better */
+.minus {
+	font-size: 20pt;
 	line-height: 25px;
 	margin-top: 1px;
 	margin-left: 2px;
 }
 
-.plusButton {
-	position: absolute;
-	background-color: transparent;
-	color: var(--clr-accent);
-	height: 27px;
-	width: 27px;
+.plus {
 	font-size: 16pt;
-	text-align: center;
-	border: none;
-	cursor: pointer;
-	z-index: 5;
-	/* Another 4 */
-	margin-right: 2px;
 	margin-top: 2.5px;
 	line-height: 25px;
+	/* This one physically hurts me */
 	transform: translateX(-107%);
 }
 
 /* --- */
 
-.filtersContainer {
+/* --- */
+
+.quickFilters {
 	display: flex;
 	width: 80%;
 	min-height: 25px;
 	border: var(--border);
 }
 
-.filterHeader {
+.quickFilters > summary {
 	margin-left: 2vw;
 	margin-top: 2vw;
 	font-size: 10pt;
 	min-height: 25px;
+	outline: 0;
 	color: var(--clr-accent);
 }
 
-.helpFiltersButton {
+/* The help button */
+/* TODO | Add actual help overlay */
+.quickFilters > summary > button {
 	border: none;
 	background-color: transparent;
+	outline: 0;
 	color: var(--clr-accent);
 	cursor: pointer;
-	right: 0;
-	margin-left: auto;
 }
 
-.filters {
+.filterContainer {
 	border-top: var(--border);
+	gap: 7vw;
 }
 
-.filterToggle {
+/* Filter labels */
+.filterContainer > div > h3 {
 	color: var(--clr-accent);
+	margin: 0;
 }
+
+/* --- Output */
+
+.outputContainer {
+	width: 100%;
+}
+
+/* Yes im using a input element as the output lol */
+.outputContainer > input {
+	width: 66%;
+	height: 25px;
+	cursor: copy;
+	font-family: monospace;
+}
+
+.outputContainer > button {
+	width: 31px;
+	background-color: transparent;
+	aspect-ratio: 1;
+	border: var(--border);
+	border-left: none;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.outputContainer > button > img {
+	filter: invert();
+	scale: 1.5;
+}
+
+/* --- */
+
+.footer {
+	height: 35px;
+	margin-top: -5px;
+	gap: 10vw;
+}
+
+.footer > a {
+	color: var(--clr-accent);
+	filter: brightness(80%);
+}
+
+/* --- Custom checkbox styling */
 
 input[type="checkbox"] {
 	appearance: none;
@@ -232,69 +290,46 @@ input[type="checkbox"]:checked::after {
 	top: -6px;
 }
 
+/* --- Custom focus styles */
+
 input[type="checkbox"]:focus {
-	outline: none;
+	outline: 0;
 	scale: 1.1;
 }
 
-/* --- */
-
-.outputContainer {
-	width: 100%;
+/* This lets you tab the focus the summary element but affects the sourrounding div */
+details.quickFilters:not([open]):has(> summary:focus-within) {
+  scale: 1.05;
 }
 
-.output {
-	width: 66%;
-	height: 25px;
-	cursor: copy;
-	font-family: monospace;
+details.quickFilters[open] > summary:focus {
+  text-decoration: underline;
 }
 
-.toggleViewButton{
-	width: 31px;
-	background-color: transparent;
-	aspect-ratio: 1;
-	border: var(--border);
-	border-left: none;
-	cursor: pointer;
-	overflow: hidden;
+.quickFilters > summary > button:focus {
+	text-decoration: underline;
 }
 
-.toggleButtonImg {
-	filter: invert();
-	scale: 1.5;
+.numberInputButton:focus {
+	outline: 0;
+	scale: 1.05;
+	text-decoration: underline;
 }
 
-/* --- */
-
-.links {
-	height: 35px;
-	margin-top: -5px;
-	gap: 10vw;
+input[type="text"]:focus,
+.outputContainer > button:focus,
+input[type="password"]:focus {
+	outline: 0;
+	scale: 1.05;
 }
 
-.bottomLink {
-	color: var(--clr-accent);
-	filter: brightness(80%);
+.footer > a:hover,
+.footer > a:focus {
+	outline: 0;
+	filter: brightness(100%);
 }
 
-.copiedOverlay {
-	visibility: hidden;
-	position: absolute;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: 0;
-	background-color: hsla(0, 0%, 0%, 0.7);
-	z-index: 10;
-}
-
-.overlayText {
-	color:var(--clr-accent);
-	font-size: 18vw;
-}
-
-/* --- */
+/* --- Utillity */
 
 .flex-side-side {
 	display: flex;
@@ -307,4 +342,8 @@ input[type="checkbox"]:focus {
 	align-items: center;
 	justify-content: center;
 	flex-direction: column;
+}
+
+.nslct {
+	user-select: none;
 }
