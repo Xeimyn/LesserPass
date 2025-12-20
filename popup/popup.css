@@ -125,7 +125,6 @@ input[type="text"],input[type="password"],input[type="number"] {
 }
 
 .monoMoji {
-	/* TODO | Offer a setting for non monochrome passmojis */
 	filter: grayscale(100%) brightness(125%);
 }
 

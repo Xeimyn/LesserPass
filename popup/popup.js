@@ -1,44 +1,133 @@
 document.addEventListener("DOMContentLoaded", async () => {
-	// No matter what, we need to know our ui elements n shit
+	// --- Loading Settings and UI
+	// const SETTINGS = await loadSettings()
+	// 		console.log(SETTINGS)
+
+	const SETTINGS = {
+		urlFormatting: {
+			stripProtocol: true,
+			stripSubdomain: true,
+			stripPort: true,
+			stripPath: true,
+		},
+		defaultInputs: {
+			defaultLogin: "",
+			defaultLength: 16,
+			defaultIndex: 1,
+			charset: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?-_.+"
+		},
+		uiSettings: {
+			overlay:{
+				enabled: true,
+				duration: 1250
+			},
+			monochromeMojis: false,
+			autoFocus: "None" // Default value for the select element
+		},
+		special: {
+			genLogin: {
+				enabled: true,
+				settings: {
+					// %s = site aka smth like google.com -> google
+					// %d = domain aka smth like domain.dev
+					// -> google@domain.dev
+					template: "%s@%d",
+					domain: "jcms.dev",
+				},
+			},
+			autoFill: false,
+		}
+	};
+
+
+	// load all elements first
 	const EL_overlay = document.getElementById("copiedOverlay");
 	const EL_site = document.getElementById("site");
 	const EL_login = document.getElementById("login");
 	const EL_masterpw = document.getElementById("masterpw");
 	const EL_passMojiContainer = document.getElementsByClassName("passMojiContainer")[0];
-	const ListOf_EL_passMojis = document.getElementsByClassName("emoji");
+	const EL_passMojis = document.getElementsByClassName("emoji");
 	const EL_length = document.getElementById("LengthInput");
 	const EL_index = document.getElementById("IndexInput");
+	const EL_filterLowers = document.getElementById("filterLowers")
+	const EL_filterCaps = document.getElementById("filterCaps")
+	const EL_filterNumbers = document.getElementById("filterNumbers")
+	const EL_filterSymbols = document.getElementById("filterSymbols")
 	const EL_output = document.getElementById("output");
-
 	const EL_toggleView = document.getElementById("toggleView");
 	const EL_toggleViewImg = document.getElementById("toggleViewImage");
 
-	const quickNumberSettingElements = document.getElementsByClassName("quickNumberSetting");
+	// --- Fill UI with values
 
-	// And also no matter what, we GOTTA load the settings
-	const SETTINGS = JSON.parse(localStorage.getItem("LesserPassSettings")) || {};
-	if (Object.keys(SETTINGS).length === 0) {
-		// If the Settings are literally non existant, open the settings page...
-		chrome.tabs.create({ url: chrome.runtime.getURL("settings/settings.html") });
-		return;
+	// Get tab URL
+	let url
+
+	chrome.runtime.sendMessage({ action:"getOpenedViaButton"}, async (response) => {
+	if (response[0] === true) {
+		chrome.runtime.sendMessage({ action:"resetOpenedViaButton"});
+		url = response[1]
+	} else {
+		const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+		url = tab.url
 	}
 
-	// ---
+	// Set url
+	EL_site.value = cleanUrl(url, SETTINGS.urlFormatting.stripProtocol, SETTINGS.urlFormatting.stripSubdomain, SETTINGS.urlFormatting.stripPort, SETTINGS.urlFormatting.stripPath, );
 
-	// Before doing anything, establish function of buttons n shit
-	EL_toggleView.addEventListener("click", () => {
-		const isPassword = EL_output.type === "password";
-		EL_output.type = isPassword ? "text" : "password";
-		EL_toggleViewImg.src = isPassword ? "../assets/icons/eye_blind.svg" : "../assets/icons/eye.svg";
-	});
+	// Set login
+	if (SETTINGS.special.genLogin.enabled) {
+		// No matter the user settings loginGen requries a fully cleaned domain
+		pureDomain = cleanUrl(url,true,true,true,true)
+		generatedLogin = generateLogin( pureDomain, SETTINGS.special.genLogin.settings.template, SETTINGS.special.genLogin.settings.domain )
+		EL_login.value = generatedLogin;
+	} else {
+		EL_login.value = SETTINGS.defaultInputs.defaultLogin;
+	}
+})
 
+	// Index and length
+	EL_length.value = SETTINGS.defaultInputs.defaultLength;
+	EL_index.value = SETTINGS.defaultInputs.defaultIndex;
+
+	// This is a "proxy" function that lets me pass arguments without passing them every time essentially
+	// it is important that we pass the elements and not the values since its supposed to react to the changes value
+	const triggerRegeneration = () => regeneratePassword(
+		SETTINGS,
+		EL_site,
+		EL_login,
+		EL_masterpw,
+		EL_length,
+		EL_index,
+		EL_filterLowers,
+		EL_filterCaps,
+		EL_filterNumbers,
+		EL_filterSymbols,
+		EL_output,
+		EL_passMojis
+	);
+
+	// --- Add eventlisteners to regenerate pw if needed
+
+	// TODO | Add debounce shits so that it doesent lag behind
+	// TODO | combine these all into a custom event dispatcher so that i have 1 place where it reads it and retrigs
+	[EL_site, EL_login, EL_masterpw, EL_length, EL_index].forEach(element =>
+		element.addEventListener("keyup", triggerRegeneration)
+	);
+
+	["minusLength", "plusLength", "minusIndex", "plusIndex","filterLowers","filterCaps","filterNumbers","filterSymbols"].forEach(id =>
+		document.getElementById(id).addEventListener("click", triggerRegeneration)
+	);
+
+	// --- And finally make the UI parts work (Buttons changing value etc)
+
+
+	// View / Hide master pw
 	EL_passMojiContainer.addEventListener("click", () => {
 		const isPassword = EL_masterpw.type === "password";
 		EL_masterpw.type = isPassword ? "text" : "password";
 	});
 
-	// ---
-
+	// Make the custom number shit work
 	const adjustValue = (element, delta) => {
 		element.value = Math.max(1, (Number(element.value) || 1) + delta);
 	};
@@ -54,41 +143,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 		document.getElementById(id).addEventListener("click", handler);
 	}
 
-	const triggerRegeneration = () => regeneratePassword(
-		SETTINGS,
-		EL_site,
-		EL_login,
-		EL_masterpw,
-		EL_length,
-		EL_index,
-		EL_output,
-		ListOf_EL_passMojis
-	);
 
-	for (let index = 0; index < quickNumberSettingElements.length; index++) {
-		const element = quickNumberSettingElements[index];
-		// Add scroll event listener while hovered
-		element.addEventListener("wheel", (event) => {
-			event.preventDefault();
-			const delta = event.deltaY < 0 ? 1 : -1;
-			const inputElement = element.getElementsByClassName("numberInput")[0];
-			adjustValue(inputElement, delta);
-			triggerRegeneration();
-		});
-	}
-
-	// Now we need some event listeners so that the generated password changes when the options change.
-
-	[EL_site, EL_login, EL_masterpw, EL_length, EL_index].forEach(element =>
-		element.addEventListener("keyup", triggerRegeneration)
-	);
-
-	["minusLength", "plusLength", "minusIndex", "plusIndex"].forEach(id =>
-		document.getElementById(id).addEventListener("click", triggerRegeneration)
-	);
-
+	// Let the user copy the output by pressing enter on the input (if password is at least 1 long)
 	EL_masterpw.addEventListener("keydown",async (event) => {
 		if (EL_masterpw.value.length >= 1 && event.key === "Enter") {
+
 			if (SETTINGS.experimentalSettings.autoFill) {
 				const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 				chrome.tabs.sendMessage(tab.id,{ action: "fillPassword", password: EL_output.value }, (response) => {
@@ -98,13 +157,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 						copyToClipboard(EL_output.value, EL_overlay, SETTINGS);
 					}
 				})
+
 			} else {
 				copyToClipboard(EL_output.value,EL_overlay,SETTINGS);
 			}
 		}
 	});
 
-	// No matter what, clicking that field with the copy cursor should always copy.
+	// View / Hide output pw
+	EL_toggleView.addEventListener("click", () => {
+		const isPasswordType = EL_output.type === "password";
+		EL_output.type = isPasswordType ? "text" : "password";
+		EL_toggleViewImg.src = isPasswordType ? "../assets/icons/eye_blind.svg" : "../assets/icons/eye.svg";
+	});
+
+	// Click to copy
 	EL_output.addEventListener("click", () => copyToClipboard(EL_output.value,EL_overlay,SETTINGS));
 
 	// Let the user dismiss the overlay by clicking it
@@ -112,23 +179,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 		EL_overlay.style.visibility = "hidden";
 	});
 
-	// This is like filling out the easy parts of the test
-	EL_login.value = SETTINGS.defaultInputs.defaultLogin;
-	EL_length.value = SETTINGS.defaultInputs.defaultLength;
-	EL_index.value = SETTINGS.defaultInputs.defaultIndex;
-
-	// Set site here
-	chrome.runtime.sendMessage({ action: "getOpenedViaButton" }, async (response) => {
-		if (response[0] === true) {
-			EL_site.value = cleanUrl(response[1], SETTINGS.urlFormatting);
-			chrome.runtime.sendMessage({ action: "resetOpenedViaButton" });
-		} else {
-			const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-			EL_site.value = cleanUrl(tab.url, SETTINGS.urlFormatting);
+	// loop through EL_passMojis and remove monoMoji class
+	if (SETTINGS.uiSettings.monochromeMojis) {
+		for (const mojiElement of EL_passMojis) {
+			mojiElement.classList.remove("monoMoji");
 		}
-	});
+	}
 
-	// This is a bit dirty but...
+
+	// fill in verion number
+	let version = document.getElementById("version")
+	version.innerText = "v" + chrome.runtime.getManifest().version
+
+	// And finally, focus whatever element the user wants selected (if any)
 	if (SETTINGS.uiSettings?.autoFocus) {
 		const focusMap = {
 			"Site": EL_site,
@@ -141,9 +204,77 @@ document.addEventListener("DOMContentLoaded", async () => {
 	}
 });
 
+async function loadSettings() {
+	const SETTINGS = chrome.storage.sync.get("LesserPassSettings");
+	if (Object.keys(SETTINGS).length === 0) {
+		// If the Settings are literally non existant, open the settings page...
+		chrome.tabs.create({ url: chrome.runtime.getURL("settings/settings.html") });
+		return;
+	} else {
+		return SETTINGS
+	}
+}
+
+function cleanUrl(url, stripProtocol, stripSubdomain, stripPort, stripPath) {
+	// To avoud edge cases, remove trailing slashes
+	while (url.endsWith('/')) {
+		url = url.slice(0, -1);
+	}
+
+	let partsToRemove = []
+
+
+	if (stripProtocol) {partsToRemove.push(url.match(/^([a-zA-Z\d+\-.]*):\/\//)[0])}
+	if (stripSubdomain) {partsToRemove.push(url.match(/([a-zA-Z0-9-]+\.)+(?=[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/g))}
+	if (stripPort) {partsToRemove.push(url.match(/:\d+/))}
+
+	if (stripPath) {
+		let path = url.match(/^(?:.+?:\/\/)?[^\/?#]+(\/(?!\/).*)$/)
+		if (path != null) {
+			partsToRemove.push(path[1])
+		}
+	}
+
+	// remove all matches
+	for (const match of partsToRemove) {
+		if (match) {
+			url = url.replace(match, '');
+		}
+	}
+	return url;
+}
+
+function generateLogin(pureDomain,template,domain) {
+	template = template.replace("%s", pureDomain.split(".")[0]);
+	template = template.replace("%d", domain);
+	return template
+}
+
+function showCopiedOverlay(copiedOverlayElement,ms) {
+	copiedOverlayElement.style.visibility = "visible";
+	setTimeout(() => copiedOverlayElement.style.visibility = "hidden", ms);
+}
+
+
+function copyToClipboard(text,copiedOverlayElement,SETTINGS) {
+	navigator.clipboard.writeText(text).then(() => {
+		if (SETTINGS.uiSettings.overlay.enabled) {
+			showCopiedOverlay(copiedOverlayElement,SETTINGS.uiSettings.overlay.duration);
+		}
+		console.log('[LesserPass] Password copied to clipboard');
+	})
+}
+
+
 async function genPW(site, login, masterPassword, length, index, chars) {
 	const encoder = new TextEncoder();
 	const salt = encoder.encode(site + login + index);
+
+	// TODO | depending on the filters at least one of each should be in the final pw
+	// lets do it the restarted way
+	// once generated check if password has at least 1 x
+	// if not, count the other groups and replace a random one out of the group that has the most and at least 2 ofc
+	// repeat until its all good
 
 	try {
 		const keyMaterial = await window.crypto.subtle.importKey(
@@ -164,13 +295,28 @@ async function genPW(site, login, masterPassword, length, index, chars) {
 	}
 }
 
-async function regeneratePassword(SETTINGS, siteElement, loginElement, masterPasswordElement, lengthElement, indexElement, outputElement, emojiElements) {
+async function regeneratePassword(SETTINGS, siteElement, loginElement, masterPasswordElement, lengthElement, indexElement,filterLowersElement, filterCapsElement, filterNumbersElement, filterSymbolsElement, outputElement, emojiElements) {
 	const site = siteElement.value;
 	const login = loginElement.value;
 	const masterPassword = masterPasswordElement.value;
 	const length = Number(lengthElement.value);
 	const index = Number(indexElement.value);
-	const charset = SETTINGS.defaultInputs.charset;
+	let charset = SETTINGS.defaultInputs.charset;
+
+	// Filtering
+	if (!filterLowersElement.checked) {
+		charset = charset.replace(/[a-z]/g, "");
+	}
+
+	if (!filterCapsElement.checked) {
+		charset = charset.replace(/[A-Z]/g, "");
+	}
+	if (!filterNumbersElement.checked) {
+		charset = charset.replace(/[0-9]/g, "");
+	}
+	if (!filterSymbolsElement.checked) {
+		charset = charset.replace(/[^a-zA-Z0-9]/g, "");
+	}
 
 	if (site && login && masterPassword.length >= 1 && length >= 1 && index >= 1) {
 		const password = await genPW(site, login, masterPassword, length, index, charset);
@@ -208,58 +354,4 @@ function updateEmojiPreview(masterPasswordElement, emojiElements) {
 		emojiElements[1].innerText = "-";
 		emojiElements[2].innerText = "-";
 	}
-}
-
-function showCopiedOverlay(copiedOverlayElement,SETTINGS) {
-	if (SETTINGS.uiSettings.copiedOverlay) {
-		copiedOverlayElement.style.visibility = "visible";
-		setTimeout(() => copiedOverlayElement.style.visibility = "hidden", SETTINGS.uiSettings.copiedOverlayDuration);
-	}
-}
-
-function copyToClipboard(text,copiedOverlayElement,SETTINGS) {
-	navigator.clipboard.writeText(text).then(() => {
-		showCopiedOverlay(copiedOverlayElement,SETTINGS);
-		console.log('[LesserPass] Password copied to clipboard');
-	})
-}
-
-// Small but important thingy
-function cleanUrl(url, urlFormattingSettings) {
-	// To avoud edge cases, remove trailing slashes
-	while (url.endsWith('/')) {
-		url = url.slice(0, -1);
-	}
-
-	let partsToRemove = []
-	if (urlFormattingSettings.stripProtocol) {
-		partsToRemove.push(url.match(/^([a-zA-Z\d+\-.]*):\/\//)[0])
-	}
-
-	if (urlFormattingSettings.stripSubdomain) {
-		partsToRemove.push(url.match(/([a-zA-Z0-9-]+\.)+(?=[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/g))
-	}
-
-	if (urlFormattingSettings.stripPort) {
-		partsToRemove.push(url.match(/:\d+/))
-	}
-
-	if (urlFormattingSettings.stripPath) {
-		let path = url.match(/^(?:.+?:\/\/)?[^\/?#]+(\/(?!\/).*)$/)
-		if (path != null) {
-			partsToRemove.push(path[1])
-		} else {
-			// im doing this so that the log output stays consistent
-			partsToRemove.push(null)
-		}
-	}
-
-	console.log("Url in parts: ",partsToRemove);
-	// remove all matches
-	for (const match of partsToRemove) {
-		if (match) {
-			url = url.replace(match, '');
-		}
-	}
-	return url;
 }

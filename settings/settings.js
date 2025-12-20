@@ -107,23 +107,36 @@ document.addEventListener("DOMContentLoaded", async () => {
 	// Define structured default settings
 	const defaultSettings = {
 		urlFormatting: {
+			stripProtocol: true,
 			stripSubdomain: true,
+			stripPort: true,
 			stripPath: true,
-			stripProtocol: true
 		},
 		defaultInputs: {
 			defaultLogin: "",
 			defaultLength: 16,
 			defaultIndex: 1,
-			charset: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!`\"§$\%&/(){[]}=?'#.,;:<>|_-"
+			charset: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?-_.+"
 		},
 		uiSettings: {
-			copiedOverlay: true,
-			copiedOverlayDuration: 1250,
+			overlay:{
+				enabled: true,
+				duration: 1250
+			},
 			autoFocus: "None" // Default value for the select element
 		},
-		experimentalSettings: {
-			autoFill: false
+		special: {
+			genLogin: {
+				enabled: false,
+				settings: {
+					// %s = site aka smth like google.com -> google
+					// %d = domain aka smth like domain.dev
+					// -> google@domain.dev
+					template: "%s@%d",
+					domain: "",
+				},
+			},
+			autoFill: false,
 		}
 	};
 
