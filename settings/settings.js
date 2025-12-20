@@ -1,3 +1,6 @@
+// TODO | redo settings | add new settings
+
+
 // Gets called when the window opens.
 document.addEventListener("DOMContentLoaded", async () => {
 
