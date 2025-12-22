@@ -111,7 +111,7 @@ input[type="text"],input[type="password"],input[type="number"] {
 	border: var(--border);
 	border-left: 0;
 	/* Indicate the hidden feature that clicking will toggle masterpw visibillity */
-	/* TODO | Add a tooltop someday */
+	/* TODO | Add a tooltip someday */
 	cursor: pointer;
 	/* remove list marker */
 	list-style: none;
@@ -222,6 +222,7 @@ input::-webkit-inner-spin-button {
 /* Filter labels */
 .filterContainer > div > h3 {
 	color: var(--clr-accent);
+	font-weight: normal;
 	margin: 0;
 }
 
