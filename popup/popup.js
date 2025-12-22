@@ -1,44 +1,42 @@
 document.addEventListener("DOMContentLoaded", async () => {
 	// --- Loading Settings and UI
-	// const SETTINGS = await loadSettings()
-	// 		console.log(SETTINGS)
+	const SETTINGS = await loadSettings()
 
-	const SETTINGS = {
-		urlFormatting: {
-			stripProtocol: true,
-			stripSubdomain: true,
-			stripPort: true,
-			stripPath: true,
-		},
-		defaultInputs: {
-			defaultLogin: "",
-			defaultLength: 16,
-			defaultIndex: 1,
-			charset: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?-_.+"
-		},
-		uiSettings: {
-			overlay:{
-				enabled: true,
-				duration: 1250
-			},
-			monochromeMojis: false,
-			autoFocus: "None" // Default value for the select element
-		},
-		special: {
-			genLogin: {
-				enabled: true,
-				settings: {
-					// %s = site aka smth like google.com -> google
-					// %d = domain aka smth like domain.dev
-					// -> google@domain.dev
-					template: "%s@%d",
-					domain: "jcms.dev",
-				},
-			},
-			autoFill: false,
-		}
-	};
-
+	// const SETTINGS = {
+	// 	urlFormatting: {
+	// 		stripProtocol: true,
+	// 		stripSubdomain: true,
+	// 		stripPort: true,
+	// 		stripPath: true,
+	// 	},
+	// 	defaultInputs: {
+	// 		defaultLogin: "",
+	// 		defaultLength: 16,
+	// 		defaultIndex: 1,
+	// 		charset: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?-_.+"
+	// 	},
+	// 	uiSettings: {
+	// 		overlay:{
+	// 			enabled: true,
+	// 			duration: 1250
+	// 		},
+	// 		monochromeMojis: true,
+	// 		autoFocus: "MasterPW" // Default value for the select element
+	// 	},
+	// 	special: {
+	// 		genLogin: {
+	// 			enabled: true,
+	// 			settings: {
+	// 				// %s = site aka smth like google.com -> google
+	// 				// %d = domain aka smth like domain.dev
+	// 				// -> google@domain.dev
+	// 				template: "%s@%d",
+	// 				domain: "jcms.dev",
+	// 			},
+	// 		},
+	// 		autoFill: false,
+	// 	}
+	// };
 
 	// load all elements first
 	const EL_overlay = document.getElementById("copiedOverlay");
@@ -91,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 	// This is a "proxy" function that lets me pass arguments without passing them every time essentially
 	// it is important that we pass the elements and not the values since its supposed to react to the changes value
-	const triggerRegeneration = () => regeneratePassword(
+	const triggerRegeneration = debounce(() => regeneratePassword(
 		SETTINGS,
 		EL_site,
 		EL_login,
@@ -104,22 +102,36 @@ document.addEventListener("DOMContentLoaded", async () => {
 		EL_filterSymbols,
 		EL_output,
 		EL_passMojis
-	);
+	));
 
 	// --- Add eventlisteners to regenerate pw if needed
+	document.addEventListener("regeneratePasswordEvent", triggerRegeneration);
 
-	// TODO | Add debounce shits so that it doesent lag behind
-	// TODO | combine these all into a custom event dispatcher so that i have 1 place where it reads it and retrigs
-	[EL_site, EL_login, EL_masterpw, EL_length, EL_index].forEach(element =>
-		element.addEventListener("keyup", triggerRegeneration)
+	[EL_site, EL_login, EL_masterpw, EL_length, EL_index].forEach(el =>
+		el.addEventListener("input", () => {
+			document.dispatchEvent(new Event("regeneratePasswordEvent"));
+		})
 	);
 
-	["minusLength", "plusLength", "minusIndex", "plusIndex","filterLowers","filterCaps","filterNumbers","filterSymbols"].forEach(id =>
-		document.getElementById(id).addEventListener("click", triggerRegeneration)
+	// This one is special, it also changes the value just like the + and - button by scrolling
+	[EL_length, EL_index].forEach(el =>
+	el.addEventListener("wheel", e => {
+		// prevent page scroll
+		e.preventDefault();
+		const delta = e.deltaY < 0 ? 1 : -1;
+		adjustValue(el, delta);
+		document.dispatchEvent(new Event("regeneratePasswordEvent"));
+		})
 	);
+
+	["minusLength","plusLength","minusIndex","plusIndex","filterLowers", "filterCaps", "filterNumbers", "filterSymbols"].forEach(id => setTimeout(() => {
+		const btn = document.getElementById(id);
+		if (btn) btn.addEventListener("click", () => {
+			document.dispatchEvent(new Event("regeneratePasswordEvent"));
+		});
+	}, 10));
 
 	// --- And finally make the UI parts work (Buttons changing value etc)
-
 
 	// View / Hide master pw
 	EL_passMojiContainer.addEventListener("click", () => {
@@ -142,7 +154,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	for (const [id, handler] of adjustListeners) {
 		document.getElementById(id).addEventListener("click", handler);
 	}
-
 
 	// Let the user copy the output by pressing enter on the input (if password is at least 1 long)
 	EL_masterpw.addEventListener("keydown",async (event) => {
@@ -179,13 +190,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 		EL_overlay.style.visibility = "hidden";
 	});
 
-	// loop through EL_passMojis and remove monoMoji class
-	if (SETTINGS.uiSettings.monochromeMojis) {
+	// remove the mono class from the emoji preview for weirdos that want that ig
+	if (!SETTINGS.uiSettings.monochromeMojis) {
 		for (const mojiElement of EL_passMojis) {
 			mojiElement.classList.remove("monoMoji");
 		}
 	}
-
 
 	// fill in verion number
 	let version = document.getElementById("version")
@@ -204,8 +214,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 	}
 });
 
+// --- core functions
+
+function debounce(fn, delay = 50) {
+	let timer;
+	return (...args) => {
+		clearTimeout(timer);
+		timer = setTimeout(() => fn(...args), delay);
+	};
+}
+
 async function loadSettings() {
-	const SETTINGS = chrome.storage.sync.get("LesserPassSettings");
+	const SETTINGS = chrome.storage.local.get("LesserPassSettings");
 	if (Object.keys(SETTINGS).length === 0) {
 		// If the Settings are literally non existant, open the settings page...
 		chrome.tabs.create({ url: chrome.runtime.getURL("settings/settings.html") });
@@ -222,7 +242,6 @@ function cleanUrl(url, stripProtocol, stripSubdomain, stripPort, stripPath) {
 	}
 
 	let partsToRemove = []
-
 
 	if (stripProtocol) {partsToRemove.push(url.match(/^([a-zA-Z\d+\-.]*):\/\//)[0])}
 	if (stripSubdomain) {partsToRemove.push(url.match(/([a-zA-Z0-9-]+\.)+(?=[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/g))}
@@ -261,20 +280,12 @@ function copyToClipboard(text,copiedOverlayElement,SETTINGS) {
 		if (SETTINGS.uiSettings.overlay.enabled) {
 			showCopiedOverlay(copiedOverlayElement,SETTINGS.uiSettings.overlay.duration);
 		}
-		console.log('[LesserPass] Password copied to clipboard');
 	})
 }
-
 
 async function genPW(site, login, masterPassword, length, index, chars) {
 	const encoder = new TextEncoder();
 	const salt = encoder.encode(site + login + index);
-
-	// TODO | depending on the filters at least one of each should be in the final pw
-	// lets do it the restarted way
-	// once generated check if password has at least 1 x
-	// if not, count the other groups and replace a random one out of the group that has the most and at least 2 ofc
-	// repeat until its all good
 
 	try {
 		const keyMaterial = await window.crypto.subtle.importKey(
@@ -282,7 +293,7 @@ async function genPW(site, login, masterPassword, length, index, chars) {
 		);
 
 		const derivedBits = await window.crypto.subtle.deriveBits(
-			{ name: "PBKDF2", salt, iterations: 300000, hash: "SHA-256" }, keyMaterial, 256
+			{ name: "PBKDF2", salt, iterations: 300000, hash: "SHA-256" }, keyMaterial, length * 8
 		);
 
 		const hashArray = Array.from(new Uint8Array(derivedBits));
@@ -311,16 +322,23 @@ async function regeneratePassword(SETTINGS, siteElement, loginElement, masterPas
 	if (!filterCapsElement.checked) {
 		charset = charset.replace(/[A-Z]/g, "");
 	}
+
 	if (!filterNumbersElement.checked) {
 		charset = charset.replace(/[0-9]/g, "");
 	}
+
 	if (!filterSymbolsElement.checked) {
 		charset = charset.replace(/[^a-zA-Z0-9]/g, "");
 	}
 
 	if (site && login && masterPassword.length >= 1 && length >= 1 && index >= 1) {
-		const password = await genPW(site, login, masterPassword, length, index, charset);
 		updateEmojiPreview(masterPasswordElement, emojiElements);
+		let password = await genPW(site, login, masterPassword, length, index, charset);
+
+		// TODO | cant be asked to make sure under 4 char passwords have all categories at this time
+		if (password.length >= 4) {
+			password = ensureCategories(password,charset,filterLowersElement.checked,filterCapsElement.checked,filterNumbersElement.checked,filterSymbolsElement.checked);
+		}
 		outputElement.value = password;
 	} else {
 		outputElement.value = "";
@@ -354,4 +372,93 @@ function updateEmojiPreview(masterPasswordElement, emojiElements) {
 		emojiElements[1].innerText = "-";
 		emojiElements[2].innerText = "-";
 	}
+}
+
+function ensureCategories(password,charset,filterLowers,filterCaps,filterNumbers,filterSymbols) {
+	let validated = 0
+	while (validated < 4) {
+		// reset the count since we start again
+		validated = 0
+		// We get a list of chars used per category in the current password, so that we know what to replace later
+		usedLowers = password.match(/[a-z]/g)
+		usedCaps = password.match(/[A-Z]/g)
+		usedNumbers = password.match(/[0-9]/g)
+		usedSymbols = password.match(/[^a-zA-Z0-9]/g)
+		// If lowers are enalbed BUT there are none used
+		if (filterLowers && (!usedLowers || usedLowers.length === 0)) {
+			//      -> fill the password, with a lowercase from charset by replacing one form the highest categories
+			password = fillInWith(password,charset.match(/[a-z]/g), usedCaps, usedNumbers, usedSymbols)
+		} else {
+			validated += 1
+		}
+		// Uppercase
+		if (filterCaps && (!usedCaps || usedCaps.length === 0)) {
+			//         fill the password, with a CAPS from charset by replacing one form the highest categories
+			password = fillInWith(password,charset.match(/[A-Z]/g), usedLowers, usedNumbers, usedSymbols)
+		} else {
+			validated += 1
+		}
+		// Numbers
+		if (filterNumbers && (!usedNumbers || usedNumbers.length === 0)) {
+			//         fill the password, with a number from charset by replacing one form the highest categories
+			password = fillInWith(password,charset.match(/[0-9]/g), usedCaps, usedLowers, usedSymbols)
+		} else {
+			validated += 1
+		}
+		// Symbols
+		if (filterSymbols && (!usedSymbols || usedSymbols.length === 0)) {
+			//         fill the password, with a symbol from charset by replacing one form the highest categories
+			password = fillInWith(password,charset.match(/[^a-zA-Z0-9]/g), usedCaps, usedNumbers, usedLowers)
+		} else {
+			validated += 1
+		}
+	}
+	return password
+}
+
+function fillInWith(password, availableChars, ...categories) {
+	// deterministic seed based on the current password
+	let seed = 0;
+	for (let i = 0; i < password.length; i++) {
+		seed = (seed * 31 + password.charCodeAt(i) + i) >>> 0;
+	}
+	// xorshift
+	const deterRand = () => {
+		seed = (seed * 1664525 + 1013904223) >>> 0;
+		return seed;
+	};
+
+	// Find the category with the most used chars that also has at least 2 used chars
+	let maxCategory = null;
+	let maxCount = 1; // need at least 2 to be able to replace one
+	for (const category of categories) {
+		if (category && category.length > maxCount) {
+			maxCount = category.length;
+			maxCategory = category;
+		}
+	}
+
+	if (maxCategory) {
+		// choose a deterministic element from the maxCategory
+		const idxInCategory = deterRand() % maxCategory.length;
+		const charToReplace = maxCategory[idxInCategory];
+
+		// find all occurrences of that char in the password
+		const occurrences = [];
+		for (let i = 0; i < password.length; i++) {
+			if (password[i] === charToReplace) occurrences.push(i);
+		}
+
+		if (occurrences.length > 0) {
+			// pick a deterministic occurrence to replace
+			const occIndex = deterRand() % occurrences.length;
+			const charIndex = occurrences[occIndex];
+
+			// pick a deterministic char to insert from availableChars
+			const charToInsert = availableChars[deterRand() % availableChars.length];
+
+			password = password.substring(0, charIndex) + charToInsert + password.substring(charIndex + 1);
+		}
+	}
+	return password;
 }
