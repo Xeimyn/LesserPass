@@ -8,86 +8,51 @@
 		<script src="settings.js" defer></script>
 	</head>
 	<body class="flex-top-bottom">
-		<div class="incognitoBanner hide">
-			<h2 class="incognitoText">You may want to toggle the setting to use LesserPass in incognito windows: "chrome://extensions" -> LesserPass -> Details -> Allow in Incognito</h2>
-		</div>
-		<h1 class="mainTitle">Settings</h1>
+		<h1>Settings</h1>
 		<div class="settingsContainer flex-top-bottom">
-			<div class="urlFormatting settingsBox" sectionTitle="URL formatting">
-				<div class="checkSettingContainer">
-					<input type="checkbox" id="stripSubdomain">
-					<h2 class="checkLabel" id="togSub" >Strip subdomain (subdomain.domain.com)</h2>
+			<section id="urlFormatting" sectionTitle="URL formatting">
+				<input type="checkbox" id="stripProtocol" aria-label="Strip protocol (protocol://domain.com)">
+				<input type="checkbox" id="stripSubdomain" aria-label="Strip Subdomain (subdomain.domain.com)">
+				<input type="checkbox" id="stripPort" aria-label="Strip Port (domain.com:port)">
+				<input type="checkbox" id="stripPath" aria-label="Strip Path (domain.com/pa/th)">
+				<!-- This is where some custom thing goes for alias shits -->
+			</section>
+			<section id="defaultInputs" sectionTitle="Default inputs">
+				<input placeholder="mylogin@mydomain.com" type="text" id="login" aria-label="Default login">
+				<textarea placeholder="abcEFG123!§$" id="charset" aria-label="Character set" rows="3"></textarea>
+				<div class="flex-side-side" style="justify-content: space-around;">
+					<input type="number" placeholder="Length" id="length" aria-label="Default length">
+					<input type="number" placeholder="Index" id="index" aria-label="Default index">
 				</div>
-				<div class="checkSettingContainer">
-					<input type="checkbox" id="stripPath">
-					<h2 class="checkLabel" id="togPath" >Strip path (domain.com/pa/th)</h2>
-				</div>
-				<div class="checkSettingContainer">
-					<input type="checkbox" id="stripProtocol">
-					<h2 class="checkLabel" id="togProt" >Strip protocol (protocol://domain.com)</h2>
-				</div>
-				<div class="checkSettingContainer">
-					<input type="checkbox" id="stripPort">
-					<h2 class="checkLabel" id="togPort" >Strip port (ip:port)</h2>
-				</div>
-			</div>
-			<div class="defaultInputs settingsBox" sectionTitle="Default inputs">
-				<div class="textSettingContainer">
-					<h2 class="textLabel">Default login</h2>
-					<input type="text" id="login">
-				</div>
-				<div class="numberSettingContainer">
-					<div class="numberSideBySideSpecial">
-						<h2 class="numberLabel">Default length</h2>
-						<div class="customNumberInput">
-							<button class="minusButton" id="minusBL">-</button>
-							<input type="number" id="length" min="1">
-							<button class="plusButton" id="plusBL">+</button>
-						</div>
-					</div>
-					<div class="numberSideBySideSpecial">
-						<h2 class="numberLabel">Default index</h2>
-						<div class="customNumberInput">
-							<button class="minusButton" id="minusBI">-</button>
-							<input type="number" id="index" min="1">
-							<button class="plusButton" id="plusBI">+</button>
-						</div>
-					</div>
-				</div>
-				<div class="textSettingContainer">
-					<h2 class="textLabel">Charset</h2>
-					<textarea class="charset" id="charset" rows="2"></textarea>
-				</div>
-			</div>
-			<!-- abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW0123456789!`&quot§$\%&/(){[]}=?'#.,;:<>|_- -->
-			<div class="settingsBox UISettings" sectionTitle="UI Settings">
-				<div class="checkSettingContainer">
-					<input type="checkbox" class="toggleInput" id="copiedOverlay">
-					<h2 class="checkLabel" id="togOverlay" >Enable "Copied" overlay</h2>
-				</div>
-				<div class="numberSettingContainer flexoverwrite">
-						<h2 class="numberLabel">"Copied!" overlay duration (ms)</h2>
-						<input type="number" class="fixme2" id="copiedOverlayDuration">
-					</div>
-				<div class="selectSettingContainer">
-					<h2 class="selectLabel">Which field should be autoselected</h2>
-					<select class="focusselector fixme2" id="autoFocus">
-							<option value="Site">Site</option>
-							<option value="Login">Login</option>
-							<option value="MasterPW">Master password</option>
-							<option value="PWLength">Length</option>
-							<option value="PWIndex">Index</option>
-							<option value="None">None</option>
-					</select>
-				</div>
-			</div>
-			<div class="settingsBox Experimental" sectionTitle="Experimental">
-				<div class="checkSettingContainer">
-					<input type="checkbox" class="toggleInput" id="autoFill">
-					<h2 class="checkLabel" id="togAuto">Enable Autofill (BETA)</h2>
-				</div>
-			</div>
-			<button class="saveButton">Save Settings</button>
+			</section>
+			<section id="uiSettings" sectionTitle="UI Settings">
+				<input type="checkbox" id="monochromePassMojis" aria-label="Enable monochrome PassMojis">
+				<select id="autoFocus" aria-label="Auto selected element">
+					<option value="masterPassword">Master Password</option>
+					<option value="login">Login</option>
+					<option value="site">Site</option>
+					<option value="index">Index</option>
+					<option value="length">Length</option>
+					<option value="none">None</option>
+				</select>
+				<section id="overlay" sectionTitle="Overlay">
+					<input type="checkbox" id="enabled" aria-label="Enable overlay">
+					<input type="number" id="duration" aria-label="Overlay duration (ms)">
+				</section>
+			</section>
+			<section id="advanced" sectionTitle="Advanced Settings">
+				<section id="genLogin" sectionTitle="Generative login">
+					<input type="checkbox" id="enabled" aria-label="Enable Generative login">
+					<h3 class="helpText">YO BILBICAL CORRECT WORD ITS %S FOR SITE WITHOUT TLD AND %D FOR YOUR DOMAIN BELOW BROTHER</h3>
+					<input type="text" id="settings.template" aria-label="Generateive login template">
+					<input type="text" id="settings.domain" aria-label="Generateive login domain">
+				</section>
+				<input type="number" id="debounceDelay" aria-label="Debounce delay">
+			</section>
 		</div>
+		<footer>
+			<button id="reset">Reset Settings</button>
+			<button id="save">Save Settings</button>
+		</footer>
 	</body>
 </html>

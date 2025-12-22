@@ -10,50 +10,138 @@
 body {
 	background-color: var(--clr-background);
 	height: 100%;
+	margin: 0;
 }
 
+/* --- | This is only for the "Settings" title */
+h1 {
+	font-size: max(8vh,4vw);
+	color: var(--clr-accent);
+	margin: 0;
+	margin-bottom: 3vh;
+}
+
+/* --- */
+
+/* This is the one that holds all settings boxes */
+.settingsContainer {
+	gap: 5vh;
+}
+
+section {
+	display: flex;
+	flex-direction: column;
+	align-items: start;
+	border: var(--border);
+	min-width: 300px;
+	width: 33vw;
+	padding: 2vmin;
+	gap: 1.5vh;
+}
+
+/* Section title */
+section::before {
+	position: absolute;
+	/* Hard coded RELATIVE position for section titles */
+	margin-top: -5vh;
+	margin-left: -0.3vw;
+	padding-left: 0.3vw;
+	padding-right: 0.3vw;
+	background-color: var(--clr-background)	;
+	color: var(--clr-accent);
+	/* This actually sets the title */
+	content: attr(sectionTitle);
+	font-size: 20pt;
+	text-align: left;
+	font-family: monospace;
+}
+
+/* Size for nested sections (dont go further than 2 pls) */
+section > section {
+	width: 30.5vw;
+	min-width: 275px;
+	margin-top: 2vh;
+}
+
+/* --- */
+
+/* all labels */
+h2 {
+	color: var(--clr-accent);
+	margin: 0;
+	font-family: monospace;
+	font-size: 1.3vw;
+}
+
+/* --- */
+
+/* This is how you style the multi box selection option thingy */
+/* option {
+	background-color: var(--clr-background);
+	color: var(--clr-accent);
+} */
+
+
+/* --- | Checkbox */
+
 input[type="checkbox"] {
+	background-color: var(--clr-background);
+	border: var(--border);
 	appearance: none;
 	width: 25px;
 	height: 25px;
-	background-color: var(--clr-background);
-	border: var(--border);
-	display: inline-block;
+	aspect-ratio: 1;
 	position: relative;
 	cursor: pointer;
 	transition: 100ms;
+	margin-right: 0.5vw;
 }
 
+/* Custom enabled state */
 input[type="checkbox"]:checked::after {
 	content: "✔";
 	color: var(--clr-accent);
 	font-size: 23px;
 	position: absolute;
-	top: 9px;
-	left: 11px;
-	transform: translate(-50%, -50%);
+	/* top: 9px;
+	left: 10px; */
+	transform: translate(10%, -20%);
 }
 
+/* check boxes look better with a lesser scale */
 input[type="checkbox"]:focus {
-	outline: none;
 	scale: 1.1;
 }
 
-input[type="text"],input[type="number"] {
+/* --- | Text input */
+input[type="text"] {
 	background-color: var(--clr-background);
 	color: var(--clr-accent);
 	border: var(--border);
 	height: 25px;
+	width: 98%;
 	transition: 100ms;
 }
 
-input:focus {
-	outline: 0;
-	scale: 1.03;
+/* Text area */
+textarea {
+	background-color: var(--clr-background);
+	color: var(--clr-accent);
+	font-family: monospace;
+	font-size: 15pt;
+	resize: none;
+	border: var(--border);
+	overflow: visible;
+	width: 98%;
 }
 
-/* --- | Custom number input stuff below */
+textarea:focus {
+	outline: none;
+	scale: 1.02;
+}
 
+
+/* --- | Custom number input */
 /* SO to https://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-input-s-spin-box */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -63,252 +151,96 @@ input::-webkit-inner-spin-button {
 }
 
 input[type=number] {
+	background-color: var(--clr-background);
+	color: var(--clr-accent);
+	border: var(--border);
+	height: 25px;
+	width: 9vw;
+	transition: 100ms;
 	text-align: center;
+	font-family: monospace;
+	font-size: 1vw;
 	appearance: textfield; /* Standard */
 	-moz-appearance: textfield; /* Firefox */
 }
 
-.minusButton {
+.minus, .plus {
+	font-size: 1.3vw;
 	position: absolute;
-	background-color: transparent;
-	color: var(--clr-accent);
 	height: 27px;
 	width: 27px;
-	font-size: 20pt;
+	background-color: transparent;
+	color: var(--clr-accent);
 	text-align: center;
 	border: none;
 	cursor: pointer;
-	z-index: 5;
-	/* 3 more sins.... im sorry */
-	line-height: 25px;
-	margin-top: 1px;
-	margin-left: 2px;
+	/* if the actual number input gets focus it shoves itself infront of the buttons */
+	z-index: 2;
 }
 
-.plusButton {
-	position: absolute;
-	background-color: transparent;
-	color: var(--clr-accent);
-	height: 27px;
-	width: 27px;
-	font-size: 16pt;
-	text-align: center;
-	border: none;
-	cursor: pointer;
-	z-index: 5;
-	/* Another 4 */
-	margin-right: 2px;
-	margin-top: 2.5px;
-	line-height: 25px;
-	transform: translateX(-107%);
+.minus {
+	font-size: 1.5vw;
+	transform: translateX(20%) translateY(-8%)
 }
 
-.minusButton:focus, .plusButton:focus {
+.plus {
+	transform: translateX(410%)
+}
+
+/* --- General focus style */
+
+input:focus {
 	outline: 0;
-	text-decoration: underline;
+	scale: 1.01;
 }
 
 /* --- */
 
-.incognitoBanner {
+footer {
+	position: sticky;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	gap: 5vw;
 	width: 100%;
-	border-bottom: var(--border);
-	margin-bottom: 1vh;
+	height: fit-content;
+	padding-bottom: 2vh;
+	padding-top: 2vh;
+	left: 0;
+	bottom: 0;
+	backdrop-filter: brightness(0%);
 }
 
-.incognitoText {
-	color: var(--clr-accent);
-	margin: 2vh;
-	margin-top: 1vh;
-}
-
-.hide {
-	display: none;
-}
-
-/* --- */
-
-.mainTitle {
-	font-size: max(8vh,4vw);
-	color: var(--clr-accent);
-	margin: 0;
-	margin-bottom: 3vh;
-}
-
-/* This is the one that holds all settings boxes */
-.settingsContainer {
-	gap: 3vh;
-}
-
-.settingsBox {
-	display: flex;
-	flex-direction: column;
-	border: var(--border);
-	width: 33vw;
-	min-width: 300px;
-	padding: 2vmin;
-	gap: 10px;
-	border-radius: 15px;
-}
-
-.settingsBox::before {
-	position: absolute;
-	margin-top: -5vh;
-	margin-left: -0.3vw;
-	padding-left: 0.3vw;
-	padding-right: 0.3vw;
-	content: attr(sectionTitle); /* Holy shit this is sick af*/
-	color: var(--clr-accent);
-	background-color: var(--clr-background)	;
-	font-size: 20pt;
-	text-align: left;
-	user-select: none;
-}
-
-.Experimental {
-	--clr-accent: rgb(255, 17, 17);
-}
-
-/* --- */
-
-	.checkSettingContainer {
-		display: flex;
-		align-items: center;
-		gap: 0.5vw;
-	}
-
-	.checkLabel {
-		margin: 0;
-		font-size: max(1.7vh,1.5vw);
-		color: var(--clr-accent)
-	}
-
-/* --- */
-
-	.textSettingContainer {
-		display:flex;
-		flex-direction: column;
-		gap: 0.5vw;
-	}
-
-	.textLabel {
-		margin: 0;
-		font-size: max(1.7vh,1.5vw);
-		color: var(--clr-accent)
-	}
-
-/* --- */
-
-	.numberSettingContainer {
-		display:flex;
-		justify-content: space-evenly;
-	}
-
-	.numberLabel {
-		margin: 0;
-		font-size: max(1.7vh,1.5vw);
-		color: var(--clr-accent)
-	}
-
-	.numberSideBySideSpecial {
-		display: flex;
-		gap: 1vh;
-		flex-direction: column;
-	}
-
-	/* --- */
-
-	.textSettingContainer {
-		display: flex;
-		gap: 0.5vw;
-	}
-
-	.charset {
-		background-color: var(--clr-background);
-		color: var(--clr-accent);
-		font-family: monospace;
-		font-size: 15pt;
-		resize: none;
-		border: var(--border);
-	}
-
-	.charset:focus {
-		outline: none;
-		scale: 1.02;
-	}
-
-	.flexoverwrite {
-		flex-direction: column;
-	}
-
-	.fixme2 {
-		margin-top: 1vh;
-		width: 50%;
-	}
-
-/* --- */
-
-.selectSettingContainer {
-	display:flex;
-	flex-direction: column;
-	gap: 1vh;
-}
-
-.selectLabel {
-	margin: 0;
-	font-size: max(1.7vh,1.5vw);
-	color: var(--clr-accent)
-}
-
-.focusselector {
-	background-color: var(--clr-background);
-	color: var(--clr-accent);
+#save,#reset {
 	height: 30px;
-	border: var(--border);
-	text-align: center;
-}
-
-.focusselector:focus {
-	outline: none;
-	scale: 1.03;
-}
-
-option {
-	background-color: var(--clr-background);
-	color: var(--clr-accent);
-}
-
-/* --- */
-
-.saveButton {
-	height: 30px;
-	background-color: var(--clr-background);
-	border: var(--border);
-	color: var(--clr-accent);
-	margin-bottom: 2vh;
 	scale: 1.4;
+	background-color: var(--clr-background);
+	color: var(--clr-accent);
+	border: var(--border);
+	transition: 100ms;
 }
 
-.saveButton:focus {
+#reset {
+	border-color: red;
+}
+
+#save:hover, #save:focus-visible, #reset:hover ,#reset:focus-within {
 	outline: none;
 	scale: 1.5;
 }
 
-/* --- */
-
-.checkLabel,.textLabel,.numberLabel,.selectLabel {
-	user-select: none;
+#save:active, #reset:active {
+	outline: none;
+	scale: 1.3;
 }
 
-/* --- */
+/* --- | utility flex classes for in section management */
 
 .flex-side-side {
 	display: flex;
 	align-items: center;
-	justify-content: center;
+	justify-content: start;
+	width: 100%;
 }
 
 .flex-top-bottom {

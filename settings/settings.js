@@ -1,194 +1,157 @@
-// Gets called when the window opens.
-document.addEventListener("DOMContentLoaded", async () => {
 
-	const incognitoBanner = document.getElementsByClassName("incognitoBanner")[0]
+document.addEventListener('DOMContentLoaded', () => {
+    // Iterate over all inputs, textareas, selects
+    document.querySelectorAll('.settingsContainer input, .settingsContainer textarea, .settingsContainer select').forEach(el => {
+        const labelText = el.getAttribute('aria-label');
 
-//  ---
+        // --- Checkboxes
+        if (el.type === 'checkbox') {
+            if (labelText) {
+                const h2 = document.createElement('h2');
+                h2.textContent = labelText;
 
-	const stripSubdomainElement = document.getElementById("stripSubdomain")
-	const stripSubdomainLabelElement = document.getElementById("togSub")
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex-side-side';
 
-	const stripPathElement = document.getElementById("stripPath")
-	const stripPathLabelElement = document.getElementById("togPath")
+                // checkbox first, label second
+                el.parentNode.insertBefore(wrapper, el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(h2);
+            }
+        }
+        // --- Number
+       else if (el.type === 'number') {
+            const labelText = el.getAttribute('aria-label');
 
-	const stripProtocolElement = document.getElementById("stripProtocol")
-	const stripProtocolLabelElement = document.getElementById("togProt")
+            // Outer wrapper div that will contain the label and combo
+            const wrapper = document.createElement('div');
+            wrapper.className = 'number-wrapper';
 
-	const stripPortElement = document.getElementById("stripPort")
-	const stripPortLabelElement = document.getElementById("togPort")
+            // Insert wrapper BEFORE the input
+            el.parentNode.insertBefore(wrapper, el);
 
-	const defaultLoginElement = document.getElementById("login")
-	const defaultLengthElement = document.getElementById("length")
-	const minusButtonLength = document.getElementById("minusBL")
-	const plusButtonLength  = document.getElementById("plusBL")
-	const defaultIndexElement = document.getElementById("index")
-	const minusButtonIndex = document.getElementById("minusBI")
-	const plusButtonIndex  = document.getElementById("plusBI")
-	const charsetElement = document.getElementById("charset")
+            // Add label if exists
+            if (labelText) {
+                const h2 = document.createElement('h2');
+                h2.textContent = labelText;
+                wrapper.appendChild(h2);
+            }
 
-	const copiedOverlayElement = document.getElementById("copiedOverlay")
-	const copiedOverlayLabelElement = document.getElementById("togOverlay")
-	const copiedOverlayMSDurationElement = document.getElementById("copiedOverlayDuration")
+            // Inner combo div with buttons + input
+            const combo = document.createElement('div');
+            combo.className = 'input-combo';
+            combo.style.display = 'flex';
+            combo.style.alignItems = 'center';
+            combo.style.gap = '4px';
 
-	const autoFocusElement = document.getElementById("autoFocus")
+            const minus = document.createElement('button');
+            minus.type = 'button';
+            minus.textContent = '-';
+            minus.classList.add("minus")
+            minus.addEventListener('click', () => {
+                el.value = Number(el.value || 0) - 1;
+                el.dispatchEvent(new Event('change'));
+            });
 
-	const autoFillElement = document.getElementById("autoFill")
-	const autoFillLabelElement = document.getElementById("togAuto")
+            const plus = document.createElement('button');
+            plus.type = 'button';
+            plus.textContent = '+';
+            plus.classList.add("plus")
+            plus.addEventListener('click', () => {
+                el.value = Number(el.value || 0) + 1;
+                el.dispatchEvent(new Event('change'));
+            });
 
-// ---
+            // Move the input into the combo
+            combo.appendChild(minus);
+            combo.appendChild(el);
+            combo.appendChild(plus);
 
-	const saveButton = document.getElementsByClassName("saveButton")[0]
+            // Append combo to the wrapper
+            wrapper.appendChild(combo);
+        }
+        // --- other
+        else if (labelText) {
+            const h2 = document.createElement('h2');
+            h2.textContent = labelText;
+            el.insertAdjacentElement('beforebegin', h2);
+        }
+    });
 
-// ---
+    // --- Save settings
+    document.getElementById('save').addEventListener('click', () => {
+        const settingsContainer = document.querySelector('.settingsContainer');
 
-// remove "hide" class from incognito banner if the extension cant access incognito windows
-	const canAccessIncognito = await chrome.extension.isAllowedIncognitoAccess()
-	console.log(incognitoBanner);
-	console.log(canAccessIncognito);
+        function buildJSON(element) {
+            const SETTINGS = {};
 
-	if (! canAccessIncognito) {
-		incognitoBanner.classList.remove("hide");
-	}
+            element.childNodes.forEach(child => {
+                if (child.nodeType !== Node.ELEMENT_NODE) return;
 
-// Add click event listeners for labels to toggle corresponding inputs
-	stripSubdomainLabelElement.addEventListener("click", () => {
-		stripSubdomainElement.checked = !stripSubdomainElement.checked;
-	});
+                if (child.tagName === 'SECTION') {
+                    const sectionId = child.id || child.getAttribute('sectionTitle') || 'unknown';
+                    SETTINGS[sectionId] = buildJSON(child);
+                } else if (child.tagName === 'DIV') {
+                    // Recurse inside wrapper divs
+                    const inner = buildJSON(child);
+                    mergeObjects(SETTINGS, inner);
+                } else if (child.tagName === 'INPUT' || child.tagName === 'TEXTAREA' || child.tagName === 'SELECT') {
+                    let key = child.id || child.name || 'unknown';
+                    let value;
 
-	stripPathLabelElement.addEventListener("click", () => {
-		stripPathElement.checked = !stripPathElement.checked;
-	});
+                    if (child.type === 'checkbox') value = child.checked;
+                    else if (child.type === 'number') value = child.value ? Number(child.value) : 0;
+                    else value = child.value;
 
-	stripProtocolLabelElement.addEventListener("click", () => {
-		stripProtocolElement.checked = !stripProtocolElement.checked;
-	});
+                    // Split on '.' to create nested objects
+                    const parts = key.split('.');
+                    let target = SETTINGS;
+                    for (let i = 0; i < parts.length; i++) {
+                        const part = parts[i];
+                        if (i === parts.length - 1) {
+                            target[part] = value;
+                        } else {
+                            if (!target[part]) target[part] = {};
+                            target = target[part];
+                        }
+                    }
+                }
+            });
+            return SETTINGS;
+        }
 
-	copiedOverlayLabelElement.addEventListener("click", () => {
-		copiedOverlayElement.checked = !copiedOverlayElement.checked;
-	});
-
-	autoFillLabelElement.addEventListener("click", () => {
-		autoFillElement.checked = !autoFillElement.checked;
-	});
-
-	stripPortLabelElement.addEventListener("click", () => {
-		stripPortElement.checked = !stripPortElement.checked;
-	});
-
-// Used to make the custom number input buttons work
-	minusButtonLength.addEventListener("click",function() {
-		if (defaultLengthElement.value >= 2) {
-			defaultLengthElement.value -=1
-		}
-		if (defaultLengthElement.value == "") {
-			defaultLengthElement.value = 1
-		}
-	})
-
-	plusButtonLength.addEventListener("click",function() {
-		defaultLengthElement.value = Number(defaultLengthElement.value) + 1
-	})
-
-
-
-	minusButtonIndex.addEventListener("click",function() {
-		if (defaultIndexElement.value >= 2) {
-			defaultIndexElement.value -= 1
-		}
-		if (defaultIndexElement.value == "") {
-			defaultIndexElement.value = 1
-		}
-	})
-
-	plusButtonIndex.addEventListener("click",function() {
-		defaultIndexElement.value = Number(defaultIndexElement.value) + 1
-	})
-
-	// Define structured default settings
-	const defaultSettings = {
-		urlFormatting: {
-			stripProtocol: true,
-			stripSubdomain: true,
-			stripPort: true,
-			stripPath: true,
-		},
-		defaultInputs: {
-			defaultLogin: "",
-			defaultLength: 16,
-			defaultIndex: 1,
-			charset: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?-_.+"
-		},
-		uiSettings: {
-			overlay:{
-				enabled: true,
-				duration: 1250
-			},
-			autoFocus: "None" // Default value for the select element
-		},
-		special: {
-			genLogin: {
-				enabled: false,
-				settings: {
-					// %s = site aka smth like google.com -> google
-					// %d = domain aka smth like domain.dev
-					// -> google@domain.dev
-					template: "%s@%d",
-					domain: "",
-				},
-			},
-			autoFill: false,
-		}
-	};
-
-	// Load settings from localStorage or use default settings
-	let settings = JSON.parse(localStorage.getItem("LesserPassSettings"));
-	if (!settings) {
-		settings = defaultSettings;
-		localStorage.setItem("LesserPassSettings", JSON.stringify(settings));
-	}
-
-	// Apply settings to the UI
-	stripSubdomainElement.checked = settings.urlFormatting.stripSubdomain;
-	stripPathElement.checked = settings.urlFormatting.stripPath;
-	stripProtocolElement.checked = settings.urlFormatting.stripProtocol;
-	stripPortElement.checked = settings.urlFormatting.stripPort;
-	defaultLoginElement.value = settings.defaultInputs.defaultLogin;
-	defaultLengthElement.value = settings.defaultInputs.defaultLength;
-	defaultIndexElement.value = settings.defaultInputs.defaultIndex;
-	charsetElement.value = settings.defaultInputs.charset;
-	copiedOverlayElement.checked = settings.uiSettings.copiedOverlay;
-	copiedOverlayMSDurationElement.value = settings.uiSettings.copiedOverlayDuration;
-	autoFocusElement.value = settings.uiSettings.autoFocus;
-	autoFillElement.checked = settings.experimentalSettings.autoFill;
-
-
-	// Save settings when the save button is clicked
-	saveButton.addEventListener("click", () => {
-		const updatedSettings = {
-			urlFormatting: {
-				stripSubdomain: stripSubdomainElement.checked,
-				stripPath: stripPathElement.checked,
-				stripProtocol: stripProtocolElement.checked,
-				stripPort: stripPortElement.checked
-			},
-			defaultInputs: {
-				defaultLogin: defaultLoginElement.value,
-				defaultLength: Number(defaultLengthElement.value),
-				defaultIndex: Number(defaultIndexElement.value),
-				charset: charsetElement.value
-			},
-			uiSettings: {
-				copiedOverlay: copiedOverlayElement.checked,
-				copiedOverlayDuration: Number(copiedOverlayMSDurationElement.value),
-				autoFocus: autoFocusElement.value
-			},
-			experimentalSettings: {
-				autoFill: autoFillElement.checked
-			}
-		};
-
-		localStorage.setItem("LesserPassSettings", JSON.stringify(updatedSettings));
-		alert("Settings saved!");
-	});
-
+        const output = buildJSON(settingsContainer);
+        console.log(JSON.stringify(output, null, 2));
+        // TODO | save to local storage for now
+    });
 });
+
+
+function mergeObjects(target, source) {
+    for (const key in source) {
+        if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+            if (!target[key] || typeof target[key] !== 'object') target[key] = {};
+            mergeObjects(target[key], source[key]);
+        } else {
+            target[key] = source[key];
+        }
+    }
+}
+
+// --- LATER
+
+// // Load settings from localStorage or use default settings
+// let settings = JSON.parse(localStorage.getItem("LesserPassSettings"));
+// }
+// // Set settings example
+// 	localStorage.setItem("LesserPassSettings", JSON.stringify(updatedSettings));
+// });
+
+// // remove "hide" class from incognito banner if the extension cant access incognito windows
+// 	const canAccessIncognito = await chrome.extension.isAllowedIncognitoAccess()
+// 	console.log(incognitoBanner);
+// 	console.log(canAccessIncognito);
+
+// 	if (! canAccessIncognito) {
+// 		incognitoBanner.classList.remove("hide");
+// 	}
