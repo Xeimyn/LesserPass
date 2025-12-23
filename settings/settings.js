@@ -223,8 +223,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const output = buildJSON(settingsContainer);
-        console.log(JSON.stringify(output, null, 2));
         localStorage.setItem("LPSettings",JSON.stringify(output))
+        alert("Settings saved!")
     });
 
     document.getElementById("reset").addEventListener("click", () => {

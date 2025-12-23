@@ -247,7 +247,7 @@ function copyToClipboard(text,copiedOverlayElement,SETTINGS) {
 
 async function genPW(site, login, masterPassword, length, index, chars) {
 	const encoder = new TextEncoder();
-	const salt = encoder.encode(site + login + index);
+	const salt = encoder.encode(site + index + login);
 
 	try {
 		const keyMaterial = await window.crypto.subtle.importKey(
