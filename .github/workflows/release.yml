@@ -1,0 +1,29 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Get version
+      id: version
+      run: echo "version=$(jq -r .version manifest.json)" >> $GITHUB_OUTPUT
+
+    - name: Create zip
+      run: |
+        zip -r lesserpass-${{ steps.version.outputs.version }}.zip manifest.json assets/ background/ popup/ settings/ changelog/
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.version.outputs.version }}-${{ github.run_number }}
+        name: Release v${{ steps.version.outputs.version }}-${{ github.run_number }}
+        files: lesserpass-${{ steps.version.outputs.version }}.zip
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
