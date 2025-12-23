@@ -1,14 +1,51 @@
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Iterate over all inputs, textareas, selects
+document.addEventListener('DOMContentLoaded', async () => {
+    DEFAULT_SETTINGS = {
+        "urlFormatting":{
+            "stripProtocol":true,
+            "stripSubdomain":true,
+            "stripPort":true,
+            "stripPath":true
+        },
+        "defaultInputs":{
+            "login":"",
+            "charset":"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?-_.+",
+            "length":16,
+            "index":1
+        },
+        "uiSettings":{
+            "monochromePassMojis":true,
+            "animateUI":true,
+            "autoFocus":"masterPassword",
+            "overlay":{
+                "enabled":true,
+                "duration":1250
+            }
+        },
+        "advanced":{
+            "genLogin":{
+                "enabled":false,
+                "settings":{
+                    "template":"",
+                    "domain":""
+                }
+            },
+            "debounceDelay":100
+        }
+    }
+
+    // Iterate over all inputs, textareas, selects and build/fill UI extras
     document.querySelectorAll('.settingsContainer input, .settingsContainer textarea, .settingsContainer select').forEach(el => {
+        // Helper method to make it easier
         const labelText = el.getAttribute('aria-label');
+        // Load settings from localstorage for filling in form
+        const SETTINGS = JSON.parse(localStorage.getItem("LPSettings")) || DEFAULT_SETTINGS;
 
         // --- Checkboxes
         if (el.type === 'checkbox') {
             if (labelText) {
-                const h2 = document.createElement('h2');
-                h2.textContent = labelText;
+                const label = document.createElement('h2');
+                label.textContent = labelText;
 
                 const wrapper = document.createElement('div');
                 wrapper.className = 'flex-side-side';
@@ -16,41 +53,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 // checkbox first, label second
                 el.parentNode.insertBefore(wrapper, el);
                 wrapper.appendChild(el);
-                wrapper.appendChild(h2);
+                wrapper.appendChild(label);
             }
+
+            // Fill in value from settings
+            const parents = [];
+            let current = el;
+            // Go up recursively
+            while (current) {
+               if (current.id) parents.push(...current.id.split(".").reverse());
+                current = current.parentElement;
+            }
+
+            // Reverse since we went up and now we wanna go down into the settings
+            const key = parents.reverse()
+            value = SETTINGS
+            key.forEach(k => {
+                if (value) value = value[k];
+            });
+
+            // And finally set the value
+            el.checked = value
+
         }
         // --- Number
        else if (el.type === 'number') {
-            const labelText = el.getAttribute('aria-label');
 
             // Outer wrapper div that will contain the label and combo
             const wrapper = document.createElement('div');
-            wrapper.className = 'number-wrapper';
+            // wrapper.className = 'number-wrapper';
 
             // Insert wrapper BEFORE the input
             el.parentNode.insertBefore(wrapper, el);
 
             // Add label if exists
             if (labelText) {
-                const h2 = document.createElement('h2');
-                h2.textContent = labelText;
-                wrapper.appendChild(h2);
+                const label = document.createElement('h2');
+                label.textContent = labelText;
+                wrapper.appendChild(label);
             }
 
             // Inner combo div with buttons + input
             const combo = document.createElement('div');
-            combo.className = 'input-combo';
+            // combo.className = 'input-combo';
             combo.style.display = 'flex';
             combo.style.alignItems = 'center';
-            combo.style.gap = '4px';
+            // combo.style.gap = '4px';
 
             const minus = document.createElement('button');
-            minus.type = 'button';
+            // minus.type = 'button';
             minus.textContent = '-';
             minus.classList.add("minus")
             minus.addEventListener('click', () => {
-                el.value = Number(el.value || 0) - 1;
-                el.dispatchEvent(new Event('change'));
+                if (el.value >= 2) {
+                    el.value -= 1
+                }
             });
 
             const plus = document.createElement('button');
@@ -58,8 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             plus.textContent = '+';
             plus.classList.add("plus")
             plus.addEventListener('click', () => {
-                el.value = Number(el.value || 0) + 1;
-                el.dispatchEvent(new Event('change'));
+                el.value = Number(el.value) + 1
             });
 
             // Move the input into the combo
@@ -69,7 +125,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Append combo to the wrapper
             wrapper.appendChild(combo);
+
+             // Fill in value from settings
+            const parents = [];
+            let current = el;
+            // Go up recursively
+            while (current) {
+               if (current.id) parents.push(...current.id.split(".").reverse());
+                current = current.parentElement;
+            }
+
+            // Reverse since we went up and now we wanna go down into the settings
+            const key = parents.reverse()
+            value = SETTINGS
+            key.forEach(k => {
+                if (value) value = value[k];
+            });
+
+            el.value = Number(value)
+
         }
+        // Fill in rest
+        else if (el.type === 'text' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+            // Fill in value from settings
+           const parents = [];
+           let current = el;
+           // Go up recursively
+           while (current) {
+               if (current.id) parents.push(...current.id.split(".").reverse());
+               current = current.parentElement;
+           }
+
+           // Reverse since we went up and now we wanna go down into the settings
+           const key = parents.reverse()
+           value = SETTINGS
+           key.forEach(k => {
+               if (value) value = value[k];
+           });
+
+           el.value = value
+
+           if (value === undefined) {
+            console.log(el,key);
+           }
+
+        }
+
         // --- other
         else if (labelText) {
             const h2 = document.createElement('h2');
@@ -77,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             el.insertAdjacentElement('beforebegin', h2);
         }
     });
+
 
     // --- Save settings
     document.getElementById('save').addEventListener('click', () => {
@@ -122,8 +224,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const output = buildJSON(settingsContainer);
         console.log(JSON.stringify(output, null, 2));
-        // TODO | save to local storage for now
+        localStorage.setItem("LPSettings",JSON.stringify(output))
     });
+
+    document.getElementById("reset").addEventListener("click", () => {
+        localStorage.setItem("LPSettings", JSON.stringify(DEFAULT_SETTINGS));
+        window.location.reload();
+    })
+
+    // // remove "hide" class from incognito banner if the extension cant access incognito windows
+    const canAccessIncognito = await chrome.extension.isAllowedIncognitoAccess()
+    const incognitoBanner = document.getElementById("incognitoBanner")
+    console.log(canAccessIncognito);
+
+    if (!canAccessIncognito) {
+        incognitoBanner.style.display = "flex";
+    }
+
 });
 
 
@@ -137,21 +254,3 @@ function mergeObjects(target, source) {
         }
     }
 }
-
-// --- LATER
-
-// // Load settings from localStorage or use default settings
-// let settings = JSON.parse(localStorage.getItem("LesserPassSettings"));
-// }
-// // Set settings example
-// 	localStorage.setItem("LesserPassSettings", JSON.stringify(updatedSettings));
-// });
-
-// // remove "hide" class from incognito banner if the extension cant access incognito windows
-// 	const canAccessIncognito = await chrome.extension.isAllowedIncognitoAccess()
-// 	console.log(incognitoBanner);
-// 	console.log(canAccessIncognito);
-
-// 	if (! canAccessIncognito) {
-// 		incognitoBanner.classList.remove("hide");
-// 	}

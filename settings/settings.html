@@ -8,6 +8,7 @@
 		<script src="settings.js" defer></script>
 	</head>
 	<body class="flex-top-bottom">
+		<div id="incognitoBanner" style="display: none;">You may want to toggle the setting to use LesserPass in incognito windows: "chrome://extensions" -> LesserPass -> Details -> Allow in Incognito</div>
 		<h1>Settings</h1>
 		<div class="settingsContainer flex-top-bottom">
 			<section id="urlFormatting" sectionTitle="URL formatting">
@@ -26,6 +27,7 @@
 				</div>
 			</section>
 			<section id="uiSettings" sectionTitle="UI Settings">
+				<input type="checkbox" id="animateUI" aria-label="Enable small UI animations"></input>
 				<input type="checkbox" id="monochromePassMojis" aria-label="Enable monochrome PassMojis">
 				<select id="autoFocus" aria-label="Auto selected element">
 					<option value="masterPassword">Master Password</option>
@@ -43,7 +45,7 @@
 			<section id="advanced" sectionTitle="Advanced Settings">
 				<section id="genLogin" sectionTitle="Generative login">
 					<input type="checkbox" id="enabled" aria-label="Enable Generative login">
-					<h3 class="helpText">YO BILBICAL CORRECT WORD ITS %S FOR SITE WITHOUT TLD AND %D FOR YOUR DOMAIN BELOW BROTHER</h3>
+					<h3 class="helpText">Use %S for the site name without TLD (e.g., 'example' for example.com) and %D for your domain (e.g., 'mydomain.com').</h3>
 					<input type="text" id="settings.template" aria-label="Generateive login template">
 					<input type="text" id="settings.domain" aria-label="Generateive login domain">
 				</section>

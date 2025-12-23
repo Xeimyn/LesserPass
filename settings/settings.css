@@ -13,6 +13,19 @@ body {
 	margin: 0;
 }
 
+#incognitoBanner {
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	border-bottom: var(--border);
+	margin-bottom: 1vh;
+	color: var(--clr-accent);
+	padding-top: 2vh;
+	padding-bottom: 2vh;
+	font-size: 1vw;
+}
+
+
 /* --- | This is only for the "Settings" title */
 h1 {
 	font-size: max(8vh,4vw);
@@ -76,10 +89,32 @@ h2 {
 /* --- */
 
 /* This is how you style the multi box selection option thingy */
-/* option {
+option {
 	background-color: var(--clr-background);
 	color: var(--clr-accent);
-} */
+}
+
+/* --- | Select dropdown */
+
+select {
+	background-color: var(--clr-background);
+	color: var(--clr-accent);
+	border: var(--border);
+	height: 25px;
+	width: 98%;
+	transition: 100ms;
+	font-family: monospace;
+	font-size: 1vw;
+}
+
+/* --- | Help text */
+
+.helpText {
+	color: var(--clr-accent);
+	font-size: 1vw;
+	margin: 0;
+	font-family: monospace;
+}
 
 
 /* --- | Checkbox */
@@ -108,10 +143,12 @@ input[type="checkbox"]:checked::after {
 	transform: translate(10%, -20%);
 }
 
-/* check boxes look better with a lesser scale */
-input[type="checkbox"]:focus {
-	scale: 1.1;
+/* states */
+input[type="checkbox"]:hover, input[type="checkbox"]:focus-visible {
+	scale: 1.15;
+	outline: none;
 }
+
 
 /* --- | Text input */
 input[type="text"] {
@@ -123,7 +160,13 @@ input[type="text"] {
 	transition: 100ms;
 }
 
-/* Text area */
+/* states */
+input[type="text"]:hover, input[type="text"]:focus-visible {
+	scale: 1.02;
+	outline: none;
+}
+
+/* --- | Text area */
 textarea {
 	background-color: var(--clr-background);
 	color: var(--clr-accent);
@@ -135,11 +178,11 @@ textarea {
 	width: 98%;
 }
 
-textarea:focus {
-	outline: none;
+/* states */
+textarea:hover, textarea:focus-visible {
 	scale: 1.02;
+	outline: none;
 }
-
 
 /* --- | Custom number input */
 /* SO to https://stackoverflow.com/questions/3790935/can-i-hide-the-html5-number-input-s-spin-box */
@@ -187,11 +230,20 @@ input[type=number] {
 	transform: translateX(410%)
 }
 
-/* --- General focus style */
+/* states */
 
-input:focus {
-	outline: 0;
-	scale: 1.01;
+input[type=number]:hover, input[type=number]:focus-visible {
+	scale: 1.02;
+	outline: none;
+}
+
+.minus:hover, .minus:focus-visible, .plus:hover, .plus:focus-visible {
+	text-decoration: underline;
+	outline: none;
+}
+
+.minus:active, .plus:active {
+	text-decoration: none;
 }
 
 /* --- */
@@ -209,6 +261,7 @@ footer {
 	left: 0;
 	bottom: 0;
 	backdrop-filter: brightness(0%);
+	z-index: 999;
 }
 
 #save,#reset {
@@ -224,15 +277,16 @@ footer {
 	border-color: red;
 }
 
-#save:hover, #save:focus-visible, #reset:hover ,#reset:focus-within {
-	outline: none;
+/* states */
+#save:hover, #save:focus-visible, #reset:hover, #reset:focus-visible {
 	scale: 1.5;
+	outline: none;
 }
 
 #save:active, #reset:active {
-	outline: none;
 	scale: 1.3;
 }
+
 
 /* --- | utility flex classes for in section management */
 

@@ -155,11 +155,6 @@ input::-webkit-inner-spin-button {
 	-moz-appearance: textfield; /* Firefox */
 }
 
-.numberSettingContainer > input[type="number"]:focus-visible {
-	outline: 0;
-	scale: 1.05;
-}
-
 .numberInputButton {
 	position: absolute;
 	height: 27px;
@@ -297,8 +292,39 @@ input[type="checkbox"]:checked::after {
 
 /* --- Custom focus styles */
 
-input[type="checkbox"]:focus-visible {
-	outline: 0;
+.animated {
+
+input[type="checkbox"]:hover, input[type="checkbox"]:focus-visible {
+	scale: 1.1;
+	outline: none;
+}
+
+input[type="password"]:hover, input[type="password"]:focus-visible,
+input[type="text"]:hover, input[type="text"]:focus-visible {
+	scale: 1.04;
+	outline: none;
+}
+
+input[type=number]:hover, input[type=number]:focus-visible {
+	scale: 1.02;
+	outline: none;
+}
+
+.minus:hover, .minus:focus-visible, .plus:hover, .plus:focus-visible {
+	text-decoration: underline;
+	outline: none;
+}
+
+.minus:active, .plus:active {
+	text-decoration: none;
+}
+
+#toggleView:hover, #toggleView:focus-visible {
+	scale: 1.05;
+	outline: none;
+}
+
+#toggleView:active {
 	scale: 1.1;
 }
 
@@ -310,23 +336,11 @@ details.quickFilters > summary:focus-visible {
 	text-decoration: underline;
 }
 
-.numberInputButton:focus-visible {
-	outline: 0;
-	scale: 1.05;
-	text-decoration: underline;
+.footer > a:hover, .footer > a:focus-visible {
+	filter: brightness(110%);
+	outline: none;
 }
 
-input[type="text"]:focus-visible,
-.outputContainer > button:focus-visible,
-input[type="password"]:focus-visible {
-	outline: 0;
-	scale: 1.05;
-}
-
-.footer > a:hover,
-.footer > a:focus-visible {
-	outline: 0;
-	filter: brightness(100%);
 }
 
 /* --- Utillity */

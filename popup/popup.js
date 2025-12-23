@@ -2,42 +2,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	// --- Loading Settings and UI
 	const SETTINGS = await loadSettings()
 
-	// const SETTINGS = {
-	// 	urlFormatting: {
-	// 		stripProtocol: true,
-	// 		stripSubdomain: true,
-	// 		stripPort: true,
-	// 		stripPath: true,
-	// 	},
-	// 	defaultInputs: {
-	// 		defaultLogin: "",
-	// 		defaultLength: 16,
-	// 		defaultIndex: 1,
-	// 		charset: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*?-_.+"
-	// 	},
-	// 	uiSettings: {
-	// 		overlay:{
-	// 			enabled: true,
-	// 			duration: 1250
-	// 		},
-	// 		monochromeMojis: true,
-	// 		autoFocus: "MasterPW" // Default value for the select element
-	// 	},
-	// 	special: {
-	// 		genLogin: {
-	// 			enabled: true,
-	// 			settings: {
-	// 				// %s = site aka smth like google.com -> google
-	// 				// %d = domain aka smth like domain.dev
-	// 				// -> google@domain.dev
-	// 				template: "%s@%d",
-	// 				domain: "jcms.dev",
-	// 			},
-	// 		},
-	// 		autoFill: false,
-	// 	}
-	// };
-
 	// load all elements first
 	const EL_overlay = document.getElementById("copiedOverlay");
 	const EL_site = document.getElementById("site");
@@ -60,32 +24,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 	// Get tab URL
 	let url
 
-	chrome.runtime.sendMessage({ action:"getOpenedViaButton"}, async (response) => {
-	if (response[0] === true) {
-		chrome.runtime.sendMessage({ action:"resetOpenedViaButton"});
-		url = response[1]
-	} else {
-		const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-		url = tab.url
-	}
+	const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+	url = tab.url
 
 	// Set url
 	EL_site.value = cleanUrl(url, SETTINGS.urlFormatting.stripProtocol, SETTINGS.urlFormatting.stripSubdomain, SETTINGS.urlFormatting.stripPort, SETTINGS.urlFormatting.stripPath, );
 
 	// Set login
-	if (SETTINGS.special.genLogin.enabled) {
+	if (SETTINGS.advanced.genLogin.enabled) {
 		// No matter the user settings loginGen requries a fully cleaned domain
 		pureDomain = cleanUrl(url,true,true,true,true)
-		generatedLogin = generateLogin( pureDomain, SETTINGS.special.genLogin.settings.template, SETTINGS.special.genLogin.settings.domain )
+		generatedLogin = generateLogin( pureDomain, SETTINGS.advanced.genLogin.settings.template, SETTINGS.advanced.genLogin.settings.domain)
 		EL_login.value = generatedLogin;
 	} else {
-		EL_login.value = SETTINGS.defaultInputs.defaultLogin;
+		EL_login.value = SETTINGS.defaultInputs.login;
 	}
-})
 
 	// Index and length
-	EL_length.value = SETTINGS.defaultInputs.defaultLength;
-	EL_index.value = SETTINGS.defaultInputs.defaultIndex;
+	EL_length.value = SETTINGS.defaultInputs.length;
+	EL_index.value = SETTINGS.defaultInputs.index;
 
 	// This is a "proxy" function that lets me pass arguments without passing them every time essentially
 	// it is important that we pass the elements and not the values since its supposed to react to the changes value
@@ -102,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 		EL_filterSymbols,
 		EL_output,
 		EL_passMojis
-	));
+	), SETTINGS.advanced.debounceDelay);
 
 	// --- Add eventlisteners to regenerate pw if needed
 	document.addEventListener("regeneratePasswordEvent", triggerRegeneration);
@@ -159,21 +116,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 	EL_masterpw.addEventListener("keydown",async (event) => {
 		if (EL_masterpw.value.length >= 1 && event.key === "Enter") {
 
-			if (SETTINGS.experimentalSettings.autoFill) {
-				const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-				chrome.tabs.sendMessage(tab.id,{ action: "fillPassword", password: EL_output.value }, (response) => {
-					if (response) {
-						console.log("[LesserPass] Password filled in.");
-					} else {
-						copyToClipboard(EL_output.value, EL_overlay, SETTINGS);
-					}
-				})
+			// if (SETTINGS.experimentalSettings.autoFill) {
+			// 	const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+			// 	chrome.tabs.sendMessage(tab.id,{ action: "fillPassword", password: EL_output.value }, (response) => {
+			// 		if (response) {
+			// 			console.log("[LesserPass] Password filled in.");
+			// 		} else {
+			// 			copyToClipboard(EL_output.value, EL_overlay, SETTINGS);
+			// 		}
+			// 	})
 
-			} else {
+			// } else {
 				copyToClipboard(EL_output.value,EL_overlay,SETTINGS);
-			}
+			// }
 		}
 	});
+
+	if (SETTINGS.uiSettings.animateUI) {
+		document.body.classList.add("animated");
+	}
 
 	// View / Hide output pw
 	EL_toggleView.addEventListener("click", () => {
@@ -191,7 +152,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	});
 
 	// remove the mono class from the emoji preview for weirdos that want that ig
-	if (!SETTINGS.uiSettings.monochromeMojis) {
+	if (!SETTINGS.uiSettings.monochromePassMojis) {
 		for (const mojiElement of EL_passMojis) {
 			mojiElement.classList.remove("monoMoji");
 		}
@@ -204,11 +165,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 	// And finally, focus whatever element the user wants selected (if any)
 	if (SETTINGS.uiSettings?.autoFocus) {
 		const focusMap = {
-			"Site": EL_site,
-			"Login": EL_login,
-			"MasterPW": EL_masterpw,
-			"PWLength": EL_length,
-			"PWIndex": EL_index,
+			"site": EL_site,
+			"login": EL_login,
+			"masterPassword": EL_masterpw,
+			"length": EL_length,
+			"index": EL_index,
 		};
 		focusMap[SETTINGS.uiSettings.autoFocus]?.focus();
 	}
@@ -216,7 +177,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // --- core functions
 
-function debounce(fn, delay = 50) {
+// TODO | make debounce setting affect this
+function debounce(fn, delay) {
 	let timer;
 	return (...args) => {
 		clearTimeout(timer);
@@ -225,13 +187,13 @@ function debounce(fn, delay = 50) {
 }
 
 async function loadSettings() {
-	const SETTINGS = chrome.storage.local.get("LesserPassSettings");
+	const SETTINGS =localStorage.getItem("LPSettings");
 	if (Object.keys(SETTINGS).length === 0) {
 		// If the Settings are literally non existant, open the settings page...
 		chrome.tabs.create({ url: chrome.runtime.getURL("settings/settings.html") });
 		return;
 	} else {
-		return SETTINGS
+		return JSON.parse(SETTINGS)
 	}
 }
 
