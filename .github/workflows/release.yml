@@ -61,8 +61,8 @@ jobs:
         if: steps.changed.outputs.changed == 'true'
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.version.outputs.version }}-${{ github.run_number }}
-          name: Release v${{ steps.version.outputs.version }}-${{ github.run_number }}
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
           files: lesserpass-${{ steps.version.outputs.version }}.zip
           generate_release_notes: true
         env:
