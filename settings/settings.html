@@ -42,6 +42,12 @@
 					<input type="number" id="duration" aria-label="Overlay duration (ms)">
 				</section>
 			</section>
+			<section id="security" sectionTitle="Security Settings">
+				<h2>Static Secret</h2>
+				<h3 class="helpText">Regenerating this secret will change the output even if all the inputs are the same.</h3>
+				<input type="password" id="staticSecret" aria-label="Static Secret">
+				<button id="regenSecret">Regenerate</button>
+			</section>
 			<section id="advanced" sectionTitle="Advanced Settings">
 				<section id="genLogin" sectionTitle="Generative login">
 					<input type="checkbox" id="enabled" aria-label="Enable Generative login">

@@ -151,7 +151,7 @@ input[type="checkbox"]:hover, input[type="checkbox"]:focus-visible {
 
 
 /* --- | Text input */
-input[type="text"] {
+input[type="text"], input[type="password"] {
 	background-color: var(--clr-background);
 	color: var(--clr-accent);
 	border: var(--border);
@@ -161,7 +161,8 @@ input[type="text"] {
 }
 
 /* states */
-input[type="text"]:hover, input[type="text"]:focus-visible {
+input[type="text"]:hover, input[type="text"]:focus-visible,
+input[type="password"]:hover, input[type="password"]:focus-visible {
 	scale: 1.02;
 	outline: none;
 }
@@ -264,7 +265,7 @@ footer {
 	z-index: 999;
 }
 
-#save,#reset {
+#save,#reset,#regenSecret {
 	height: 30px;
 	scale: 1.4;
 	background-color: var(--clr-background);
@@ -277,13 +278,28 @@ footer {
 	border-color: red;
 }
 
+#regenSecret {
+	scale: 1.0;
+}
+
+#regenSecret:active {
+	scale: 1.15;
+}
+
+#regenSecret:hover, #regenSecret:focus-visible {
+	scale: 1.1;
+	outline: none;
+}
+
 /* states */
-#save:hover, #save:focus-visible, #reset:hover, #reset:focus-visible {
+#save:hover, #save:focus-visible,
+#reset:hover, #reset:focus-visible {
 	scale: 1.5;
 	outline: none;
 }
 
-#save:active, #reset:active {
+#save:active,
+#reset:active {
 	scale: 1.3;
 }
 

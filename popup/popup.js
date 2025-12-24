@@ -245,9 +245,9 @@ function copyToClipboard(text,copiedOverlayElement,SETTINGS) {
 	})
 }
 
-async function genPW(site, login, masterPassword, length, index, chars) {
+async function genPW(site, login, masterPassword, length, index, chars, staticSecret) {
 	const encoder = new TextEncoder();
-	const salt = encoder.encode(site + index + login);
+	const salt = encoder.encode(site + staticSecret + index + login);
 
 	try {
 		const keyMaterial = await window.crypto.subtle.importKey(
@@ -294,8 +294,7 @@ async function regeneratePassword(SETTINGS, siteElement, loginElement, masterPas
 	}
 
 	if (site && login && masterPassword.length >= 1 && length >= 1 && index >= 1) {
-		updateEmojiPreview(masterPasswordElement, emojiElements);
-		let password = await genPW(site, login, masterPassword, length, index, charset);
+		let password = await genPW(site, login, masterPassword, length, index, charset, SETTINGS.security.staticSecret);
 
 		// TODO | cant be asked to make sure under 4 char passwords have all categories at this time
 		if (password.length >= 4) {
@@ -304,8 +303,8 @@ async function regeneratePassword(SETTINGS, siteElement, loginElement, masterPas
 		outputElement.value = password;
 	} else {
 		outputElement.value = "";
-		updateEmojiPreview(masterPasswordElement, emojiElements);
 	}
+	debounce(() => updateEmojiPreview(masterPasswordElement, emojiElements), 1100)();
 }
 
 function updateEmojiPreview(masterPasswordElement, emojiElements) {
