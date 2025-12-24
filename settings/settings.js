@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 "duration":1250
             }
         },
+        "security":{
+            "staticSecret":""
+        },
         "advanced":{
             "genLogin":{
                 "enabled":false,
@@ -34,12 +37,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    document.getElementById("regenSecret")?.addEventListener("click", () => {
+        const newSecret = crypto.randomUUID().replace(/-/g, '');
+        document.getElementById("staticSecret").value = newSecret;
+    })
+
     // Iterate over all inputs, textareas, selects and build/fill UI extras
     document.querySelectorAll('.settingsContainer input, .settingsContainer textarea, .settingsContainer select').forEach(el => {
         // Helper method to make it easier
         const labelText = el.getAttribute('aria-label');
         // Load settings from localstorage for filling in form
         const SETTINGS = JSON.parse(localStorage.getItem("LPSettings")) || DEFAULT_SETTINGS;
+
+        // handle staticSecret stuff
+        if (SETTINGS.security.staticSecret === undefined || SETTINGS.security.staticSecret == "") {
+            SETTINGS.security.staticSecret = crypto.randomUUID().replace(/-/g, '');
+        } else {
+            // Overwrite local default settings to keep secret when resetting settings
+            DEFAULT_SETTINGS.security.staticSecret = SETTINGS.security.staticSecret;
+        }
+
+
 
         // --- Checkboxes
         if (el.type === 'checkbox') {
@@ -146,7 +164,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         }
         // Fill in rest
-        else if (el.type === 'text' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+        else if (el.type === 'text' || el.type === "password" || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
             // Fill in value from settings
            const parents = [];
            let current = el;
@@ -178,7 +196,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             el.insertAdjacentElement('beforebegin', h2);
         }
     });
-
 
     // --- Save settings
     document.getElementById('save').addEventListener('click', () => {
@@ -235,7 +252,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // // remove "hide" class from incognito banner if the extension cant access incognito windows
     const canAccessIncognito = await chrome.extension.isAllowedIncognitoAccess()
     const incognitoBanner = document.getElementById("incognitoBanner")
-    console.log(canAccessIncognito);
 
     if (!canAccessIncognito) {
         incognitoBanner.style.display = "flex";
