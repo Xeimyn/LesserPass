@@ -1,6 +1,18 @@
+import { LPCore, filterURL } from "../core/core.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
 	// --- Loading Settings and UI
 	const SETTINGS = await loadSettings()
+
+	//  --- Load Core class
+	let CORE = new LPCore(
+		SETTINGS.defaultInputs.charset,
+		SETTINGS.security.staticSecret,
+		SETTINGS.urlFormatting.stripProtocol,
+		SETTINGS.urlFormatting.stripSubdomain,
+		SETTINGS.urlFormatting.stripPath,
+		SETTINGS.urlFormatting.stripPort
+	)
 
 	// load all elements first
 	const EL_overlay = document.getElementById("copiedOverlay");
@@ -28,13 +40,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 	url = tab.url
 
 	// Set url
-	EL_site.value = cleanUrl(url, SETTINGS.urlFormatting.stripProtocol, SETTINGS.urlFormatting.stripSubdomain, SETTINGS.urlFormatting.stripPort, SETTINGS.urlFormatting.stripPath, );
+	EL_site.value = filterURL(url, SETTINGS.urlFormatting);
 
 	// Set login
 	if (SETTINGS.advanced.genLogin.enabled) {
 		// No matter the user settings loginGen requries a fully cleaned domain
-		pureDomain = cleanUrl(url,true,true,true,true)
-		generatedLogin = generateLogin( pureDomain, SETTINGS.advanced.genLogin.settings.template, SETTINGS.advanced.genLogin.settings.domain)
+		let pureDomain = url
+		// ugly but it lets me reuse the function for rn
+		pureDomain = filterURL(url,{"stripProtocol":true,"stripSubdomain":true,"stripPath":true,"stripPort":true,})
+		let generatedLogin = generateLogin( pureDomain, SETTINGS.advanced.genLogin.settings.template, SETTINGS.advanced.genLogin.settings.domain)
 		EL_login.value = generatedLogin;
 	} else {
 		EL_login.value = SETTINGS.defaultInputs.login;
@@ -47,6 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	// This is a "proxy" function that lets me pass arguments without passing them every time essentially
 	// it is important that we pass the elements and not the values since its supposed to react to the changes value
 	const triggerRegeneration = debounce(() => regeneratePassword(
+		CORE,
 		SETTINGS,
 		EL_site,
 		EL_login,
@@ -116,6 +131,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 	EL_masterpw.addEventListener("keydown",async (event) => {
 		if (EL_masterpw.value.length >= 1 && event.key === "Enter") {
 
+			// TODO | - autofill
 			// if (SETTINGS.experimentalSettings.autoFill) {
 			// 	const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 			// 	chrome.tabs.sendMessage(tab.id,{ action: "fillPassword", password: EL_output.value }, (response) => {
@@ -187,7 +203,7 @@ function debounce(fn, delay) {
 }
 
 async function loadSettings() {
-	const SETTINGS =localStorage.getItem("LPSettings");
+	const SETTINGS = localStorage.getItem("LPSettings");
 	if (Object.keys(SETTINGS).length === 0) {
 		// If the Settings are literally non existant, open the settings page...
 		chrome.tabs.create({ url: chrome.runtime.getURL("settings/settings.html") });
@@ -195,34 +211,6 @@ async function loadSettings() {
 	} else {
 		return JSON.parse(SETTINGS)
 	}
-}
-
-function cleanUrl(url, stripProtocol, stripSubdomain, stripPort, stripPath) {
-	// To avoud edge cases, remove trailing slashes
-	while (url.endsWith('/')) {
-		url = url.slice(0, -1);
-	}
-
-	let partsToRemove = []
-
-	if (stripProtocol) {partsToRemove.push(url.match(/^([a-zA-Z\d+\-.]*):\/\//)[0])}
-	if (stripSubdomain) {partsToRemove.push(url.match(/([a-zA-Z0-9-]+\.)+(?=[a-zA-Z0-9-]+\.[a-zA-Z]{2,})/g))}
-	if (stripPort) {partsToRemove.push(url.match(/:\d+/))}
-
-	if (stripPath) {
-		let path = url.match(/^(?:.+?:\/\/)?[^\/?#]+(\/(?!\/).*)$/)
-		if (path != null) {
-			partsToRemove.push(path[1])
-		}
-	}
-
-	// remove all matches
-	for (const match of partsToRemove) {
-		if (match) {
-			url = url.replace(match, '');
-		}
-	}
-	return url;
 }
 
 function generateLogin(pureDomain,template,domain) {
@@ -245,181 +233,18 @@ function copyToClipboard(text,copiedOverlayElement,SETTINGS) {
 	})
 }
 
-async function genPW(site, login, masterPassword, length, index, chars, staticSecret) {
-	const encoder = new TextEncoder();
-	const salt = encoder.encode(site + staticSecret + index + login);
-
-	try {
-		const keyMaterial = await window.crypto.subtle.importKey(
-			"raw", encoder.encode(masterPassword), { name: "PBKDF2" }, false, ["deriveBits"]
-		);
-
-		const derivedBits = await window.crypto.subtle.deriveBits(
-			{ name: "PBKDF2", salt, iterations: 300000, hash: "SHA-256" }, keyMaterial, length * 8
-		);
-
-		const hashArray = Array.from(new Uint8Array(derivedBits));
-		return Array.from({ length }, (_, i) =>
-			chars[(hashArray[i] + hashArray[(i + length) % hashArray.length]) % chars.length]
-		).join('');
-	} catch (error) {
-		console.warn("[LesserPass] PBKDF2 failed.");
-		return "";
-	}
-}
-
-async function regeneratePassword(SETTINGS, siteElement, loginElement, masterPasswordElement, lengthElement, indexElement,filterLowersElement, filterCapsElement, filterNumbersElement, filterSymbolsElement, outputElement, emojiElements) {
+async function regeneratePassword(CORE, SETTINGS, siteElement, loginElement, masterPasswordElement, lengthElement, indexElement,filterLowersElement, filterCapsElement, filterNumbersElement, filterSymbolsElement, outputElement, emojiElements) {
 	const site = siteElement.value;
 	const login = loginElement.value;
 	const masterPassword = masterPasswordElement.value;
 	const length = Number(lengthElement.value);
 	const index = Number(indexElement.value);
-	let charset = SETTINGS.defaultInputs.charset;
-
-	// Filtering
-	if (!filterLowersElement.checked) {
-		charset = charset.replace(/[a-z]/g, "");
-	}
-
-	if (!filterCapsElement.checked) {
-		charset = charset.replace(/[A-Z]/g, "");
-	}
-
-	if (!filterNumbersElement.checked) {
-		charset = charset.replace(/[0-9]/g, "");
-	}
-
-	if (!filterSymbolsElement.checked) {
-		charset = charset.replace(/[^a-zA-Z0-9]/g, "");
-	}
 
 	if (site && login && masterPassword.length >= 1 && length >= 1 && index >= 1) {
-		let password = await genPW(site, login, masterPassword, length, index, charset, SETTINGS.security.staticSecret);
-
-		// TODO | cant be asked to make sure under 4 char passwords have all categories at this time
-		if (password.length >= 4) {
-			password = ensureCategories(password,charset,filterLowersElement.checked,filterCapsElement.checked,filterNumbersElement.checked,filterSymbolsElement.checked);
-		}
+		let password = await CORE.getPW(site, login, masterPassword, length, index, filterLowersElement.checked,filterCapsElement.checked,filterNumbersElement.checked,filterSymbolsElement.checked);
 		outputElement.value = password;
 	} else {
 		outputElement.value = "";
 	}
-	debounce(() => updateEmojiPreview(masterPasswordElement, emojiElements), 1100)();
-}
-
-function updateEmojiPreview(masterPasswordElement, emojiElements) {
-	if (masterPasswordElement.value.length > 0) {
-		const emojis = [
-			"🍒","🚽","🌊","🐶","👍","🐀","🌴","🍌",
-			"🍏","🔒","🍓","🎓","🎉","🐐","🔥","✋",
-			"🤡","🤛","🐈","🚁","🔆","🌜","🔑","🎻",
-			"🚧","🏓","🎮","💜","💩","👽","👻","💀",
-			"🐱‍👤","🦄","🐍","🐉","🦖","🐘","🦞","🦴",
-			"🦷","👀","👅","🦾","🦿","🧠","✨","🎉",
-			"💍","💎","🛒","🏆","🥇","🔊","🔧","📞",
-			"💣","🔍","📌","🍗","🍇","🥕","🚲","🚀"
-		];
-
-		const hash = masterPasswordElement.value.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-		const emoji1 = emojis[hash % emojis.length];
-		const emoji2 = emojis[(hash * 2) % emojis.length];
-		const emoji3 = emojis[(hash * 3) % emojis.length];
-
-		emojiElements[0].innerText = emoji1;
-		emojiElements[1].innerText = emoji2;
-		emojiElements[2].innerText = emoji3;
-	} else {
-		emojiElements[0].innerText = "-";
-		emojiElements[1].innerText = "-";
-		emojiElements[2].innerText = "-";
-	}
-}
-
-function ensureCategories(password,charset,filterLowers,filterCaps,filterNumbers,filterSymbols) {
-	let validated = 0
-	while (validated < 4) {
-		// reset the count since we start again
-		validated = 0
-		// We get a list of chars used per category in the current password, so that we know what to replace later
-		usedLowers = password.match(/[a-z]/g)
-		usedCaps = password.match(/[A-Z]/g)
-		usedNumbers = password.match(/[0-9]/g)
-		usedSymbols = password.match(/[^a-zA-Z0-9]/g)
-		// If lowers are enalbed BUT there are none used
-		if (filterLowers && (!usedLowers || usedLowers.length === 0)) {
-			//      -> fill the password, with a lowercase from charset by replacing one form the highest categories
-			password = fillInWith(password,charset.match(/[a-z]/g), usedCaps, usedNumbers, usedSymbols)
-		} else {
-			validated += 1
-		}
-		// Uppercase
-		if (filterCaps && (!usedCaps || usedCaps.length === 0)) {
-			//         fill the password, with a CAPS from charset by replacing one form the highest categories
-			password = fillInWith(password,charset.match(/[A-Z]/g), usedLowers, usedNumbers, usedSymbols)
-		} else {
-			validated += 1
-		}
-		// Numbers
-		if (filterNumbers && (!usedNumbers || usedNumbers.length === 0)) {
-			//         fill the password, with a number from charset by replacing one form the highest categories
-			password = fillInWith(password,charset.match(/[0-9]/g), usedCaps, usedLowers, usedSymbols)
-		} else {
-			validated += 1
-		}
-		// Symbols
-		if (filterSymbols && (!usedSymbols || usedSymbols.length === 0)) {
-			//         fill the password, with a symbol from charset by replacing one form the highest categories
-			password = fillInWith(password,charset.match(/[^a-zA-Z0-9]/g), usedCaps, usedNumbers, usedLowers)
-		} else {
-			validated += 1
-		}
-	}
-	return password
-}
-
-function fillInWith(password, availableChars, ...categories) {
-	// deterministic seed based on the current password
-	let seed = 0;
-	for (let i = 0; i < password.length; i++) {
-		seed = (seed * 31 + password.charCodeAt(i) + i) >>> 0;
-	}
-	// xorshift
-	const deterRand = () => {
-		seed = (seed * 1664525 + 1013904223) >>> 0;
-		return seed;
-	};
-
-	// Find the category with the most used chars that also has at least 2 used chars
-	let maxCategory = null;
-	let maxCount = 1; // need at least 2 to be able to replace one
-	for (const category of categories) {
-		if (category && category.length > maxCount) {
-			maxCount = category.length;
-			maxCategory = category;
-		}
-	}
-
-	if (maxCategory) {
-		// choose a deterministic element from the maxCategory
-		const idxInCategory = deterRand() % maxCategory.length;
-		const charToReplace = maxCategory[idxInCategory];
-
-		// find all occurrences of that char in the password
-		const occurrences = [];
-		for (let i = 0; i < password.length; i++) {
-			if (password[i] === charToReplace) occurrences.push(i);
-		}
-
-		if (occurrences.length > 0) {
-			// pick a deterministic occurrence to replace
-			const occIndex = deterRand() % occurrences.length;
-			const charIndex = occurrences[occIndex];
-
-			// pick a deterministic char to insert from availableChars
-			const charToInsert = availableChars[deterRand() % availableChars.length];
-
-			password = password.substring(0, charIndex) + charToInsert + password.substring(charIndex + 1);
-		}
-	}
-	return password;
+	debounce(() => CORE.getPassMojis(masterPasswordElement.value), 1100)();
 }
