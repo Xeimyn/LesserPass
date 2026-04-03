@@ -37,27 +37,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    document.getElementById("regenSecret")?.addEventListener("click", () => {
-        const newSecret = crypto.randomUUID().replace(/-/g, '');
-        document.getElementById("staticSecret").value = newSecret;
-    })
-
     // Iterate over all inputs, textareas, selects and build/fill UI extras
     document.querySelectorAll('.settingsContainer input, .settingsContainer textarea, .settingsContainer select').forEach(el => {
         // Helper method to make it easier
         const labelText = el.getAttribute('aria-label');
         // Load settings from localstorage for filling in form
-        const SETTINGS = JSON.parse(localStorage.getItem("LPSettings")) || DEFAULT_SETTINGS;
+        let SETTINGS = JSON.parse(localStorage.getItem("LPSettings")) || DEFAULT_SETTINGS;
 
-        // handle staticSecret stuff
-        if (SETTINGS.security.staticSecret === undefined || SETTINGS.security.staticSecret == "") {
-            SETTINGS.security.staticSecret = crypto.randomUUID().replace(/-/g, '');
-        } else {
-            // Overwrite local default settings to keep secret when resetting settings
-            DEFAULT_SETTINGS.security.staticSecret = SETTINGS.security.staticSecret;
+        // TODO | warn if secret empty on save
+
+        // FIXME (2/2) This is a disgusting solution but it works so its fine right? (it doesent change core shit just the ui stuff is BIG EW)
+        // Split staticSecret into four parts if it's a string
+        if (typeof SETTINGS.security.staticSecret === 'string') {
+            const parts = SETTINGS.security.staticSecret.split(' ');
+            SETTINGS.security.staticSecret = {
+            one: parts[0] || '',
+            two: parts[1] || '',
+            three: parts[2] || '',
+            four: parts[3] || ''
+            };
         }
-
-
 
         // --- Checkboxes
         if (el.type === 'checkbox') {
@@ -240,6 +239,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const output = buildJSON(settingsContainer);
+
+        // FIXME (1/2) This is a disgusting solution but it works so its fine right? (it doesent change core shit just the ui stuff is BIG EW)
+        console.log(output.security);
+
+        output.security.staticSecret = [output.security.staticSecret.one,output.security.staticSecret.two,output.security.staticSecret.three,output.security.staticSecret.four].join(" ")
+        delete output.security.staticSecret.one
+        delete output.security.staticSecret.two
+        delete output.security.staticSecret.three
+        delete output.security.staticSecret.four
+
+        console.log(output.security);
+
+
         localStorage.setItem("LPSettings",JSON.stringify(output))
         alert("Settings saved!")
     });

@@ -8,10 +8,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 	let CORE = new LPCore(
 		SETTINGS.defaultInputs.charset,
 		SETTINGS.security.staticSecret,
-		SETTINGS.urlFormatting.stripProtocol,
-		SETTINGS.urlFormatting.stripSubdomain,
-		SETTINGS.urlFormatting.stripPath,
-		SETTINGS.urlFormatting.stripPort
 	)
 
 	// load all elements first
@@ -45,9 +41,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 	// Set login
 	if (SETTINGS.advanced.genLogin.enabled) {
 		// No matter the user settings loginGen requries a fully cleaned domain
-		let pureDomain = url
 		// ugly but it lets me reuse the function for rn
-		pureDomain = filterURL(url,{"stripProtocol":true,"stripSubdomain":true,"stripPath":true,"stripPort":true,})
+		let pureDomain = filterURL(url,{"stripProtocol":true,"stripSubdomain":true,"stripPath":true,"stripPort":true,})
 		let generatedLogin = generateLogin( pureDomain, SETTINGS.advanced.genLogin.settings.template, SETTINGS.advanced.genLogin.settings.domain)
 		EL_login.value = generatedLogin;
 	} else {
@@ -225,7 +220,6 @@ function showCopiedOverlay(copiedOverlayElement,ms) {
 	copiedOverlayElement.style.visibility = "visible";
 	setTimeout(() => copiedOverlayElement.style.visibility = "hidden", ms);
 }
-
 
 function copyToClipboard(text,copiedOverlayElement,SETTINGS) {
 	navigator.clipboard.writeText(text).then(() => {

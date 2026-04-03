@@ -2,12 +2,6 @@ export class LPCore {
 	constructor(charset, staticSecret, stripProtocol, stripSubdomain, stripPath, stripPort) {
 		this.charset = charset;
 		this.staticSecret = staticSecret;
-		this.urlFormatting = {
-			"stripProtocol":stripProtocol,
-			"stripSubdomain":stripSubdomain,
-			"stripPath":stripPath,
-			"stripPort":stripPort,
-		}
 	};
 
 	async getPW(siteURL,login,masterPassword, passwordLength, passwordIndex,

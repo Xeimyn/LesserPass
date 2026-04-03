@@ -44,9 +44,11 @@
 			</section>
 			<section id="security" sectionTitle="Security Settings">
 				<h2>Static Secret</h2>
-				<h3 class="helpText">Regenerating this secret will change the output even if all the inputs are the same.</h3>
-				<input type="password" id="staticSecret" aria-label="Static Secret">
-				<button id="regenSecret">Regenerate</button>
+				<h3 class="helpText">This acts as a static secret key. Simply enter 4 words you will remember like "The quick brown fox". Ignores capitalization. You will also need to remember this for using the web version and to setup other devices</h3>
+				<input type="password" id="staticSecret.one" aria-label="Secret Phrase (1/4)">
+				<input type="password" id="staticSecret.two" aria-label="Secret Phrase (2/4)">
+				<input type="password" id="staticSecret.three" aria-label="Secret Phrase (3/4)">
+				<input type="password" id="staticSecret.four" aria-label="Secret Phrase (4/4)">
 			</section>
 			<section id="advanced" sectionTitle="Advanced Settings">
 				<section id="genLogin" sectionTitle="Generative login">
