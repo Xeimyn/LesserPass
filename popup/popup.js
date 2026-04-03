@@ -195,6 +195,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // TODO | make debounce setting affect this
 function debounce(fn, delay) {
+	console.log(fn,delay);
+
 	let timer;
 	return (...args) => {
 		clearTimeout(timer);
@@ -243,8 +245,14 @@ async function regeneratePassword(CORE, SETTINGS, siteElement, loginElement, mas
 	if (site && login && masterPassword.length >= 1 && length >= 1 && index >= 1) {
 		let password = await CORE.getPW(site, login, masterPassword, length, index, filterLowersElement.checked,filterCapsElement.checked,filterNumbersElement.checked,filterSymbolsElement.checked);
 		outputElement.value = password;
+		let emojis = CORE.getPassMojis(masterPasswordElement.value)
+		emojiElements[0].innerText = emojis[0]
+		emojiElements[1].innerText = emojis[1]
+		emojiElements[2].innerText = emojis[2]
 	} else {
 		outputElement.value = "";
+		emojiElements[0].innerText = "-"
+		emojiElements[1].innerText = "-"
+		emojiElements[2].innerText = "-"
 	}
-	debounce(() => CORE.getPassMojis(masterPasswordElement.value), 1100)();
 }

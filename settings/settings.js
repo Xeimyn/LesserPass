@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     "domain":""
                 }
             },
-            "debounceDelay":100
+            "debounceDelay":200
         }
     }
 
